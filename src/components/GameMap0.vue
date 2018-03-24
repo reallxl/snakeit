@@ -52,154 +52,9 @@
     },
     methods: {
       //------------------------------------------------------------------------------------------
-      //  public APIs
-      //------------------------------------------------------------------------------------------
-      startGame() {
-        //--- hello world!
-        this.snake.bodyData.unshift({
-          pos: 0,
-        });
-        this.snake.trailingData.unshift(this.mapSize.width - 1);
-        this.map.splice(this.snake.bodyData[0].pos, 1, {
-          type: EN._NODE_TYPE._SNAKE,
-          color: PA_.DEFAULT_SNAKE_HEAD_COLOR,
-        });
-
-        //--- hello my prey!
-        this._scoutNewPrey();
-
-        this._scheduleNextStep();
-      },
-      pauseGame() {
-        this._cancelNextStep();
-      },
-      resumeGame() {
-        this._scheduleNextStep();
-      },
-      resetGame() {
-        this._cancelNextStep();
-
-        this.curLevel = PA_.INIT_GAME_LEVEL;
-        this.map.fill(null);
-        this.snake = {
-          length: PA_.INIT_BODY_LENGTH,
-          bodyData: [],
-          trailingLength: PA_.INIT_TRAILING_LENGTH,
-          trailingData: [],
-          curHeadingDir: EN._DIR._RIGHT,
-        };
-        this.effectModifier = undefined;
-
-        return 0;
-      },
-      //------------------------------------------------------------------------------------------
       //  private functions
       //------------------------------------------------------------------------------------------
-      runPhase(phase, args) {
-        //--- determine action body first
-        let actionBody;
-        if (this.effectModifier) {
-          actionBody = this.effectModifier;
-        } else {
-          actionBody = this;
-        }
-
-        switch (phasee) {
-          case EN._PHASE._PRE_STEP_MOVE:
-            return actionBody.runPreStepMovePhase(args);
-          case EN._PHASE._HEAD_MOVE:
-            return actionBody.runHeadMovePhase(args);
-          case EN._PHASE._TAIL_MOVE:
-            return actionBody.runTailMovePhase(args);
-          case EN._PHASE._POST_STEP_MOVE:
-            return actionBody.runPostStepMovePhase(args);
-          case EN._PHASE._SCHEDULE_NEXT_STEP:
-            return actionBody.runStepInitPhase(args);
-        }
-      },
-      runPreStepMovePhase(args) {
-        return {
-          curPhase: EN._PHASE._HEAD_MOVE,
-          args: {},
-        };
-      },
-      runHeadMovePhase(args) {
-        let nextHeadPos = this.getNextPos(snakeData.bodyData[0].pos, snakeData.curHeadingDir);
-
-        //--- colliding (i.e. GAME OVER)
-        if (snakeData.bodyData.find((bodyNode) => {
-          return bodyNode.pos == nextHeadPos;
-        })) {
-          console.log('collide at:', this.DBGPOS(nextHeadPos));
-          alert('Game Over!');
-          return this.resetGame();
-        }
-
-        /*if (nextHeadPos == snakeData.curTailPos && snakeData.curLength == snakeData.length) {
-          newData = Object.assign({}, this.map[snakeData.curHeadPos]);
-          newData.toDirCode = undefined;
-
-          snakeData.curHeadPos = nextHeadPos;
-          snakeData.curTailPos = this.getNextPos(snakeData.curTailPos);
-          this.map.splice(snakeData.curHeadPos, 1, newData);
-          break;
-        }*/
-
-        //--- update current head position into bodyData
-        snakeData.bodyData.unshift({
-          pos: nextHeadPos,
-        });
-
-        return {
-          curPhase: EN._PHASE._TAIL_MOVE,
-          args: {},
-        };
-      },
-      runTailMovePhase(args) {
-        //--- update tail iff the body is completely in the map
-        if (snakeData.bodyData.length > snakeData.length) {
-          snakeData.trailingData.unshift(snakeData.bodyData.pop());
-
-          //--- update trailingData
-          if (snakeData.trailingData.length > snakeData.trailingLength) {
-            snakeData.trailingData.pop();
-          }
-        }
-
-        return {
-          curPhase: EN._PHASE._SCHEDULE_NEXT_STEP,
-          args: {},
-        };
-      },
       _stepMove(snakeData, scheduleNext = true) {
-        var params = {
-          curPhase: EN._PHASE._PRE_STEP_MOVE,
-          args: {},
-        };
-
-        while (params.curPhase != EN._PHASE._SCHEDULE_NEXT_STEP) {
-           params = this.runPhase(params.curPhase, params.args);
-        }
-
-        if (scheduleNextStep) {
-          this.runPhase(params);
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         do {
           if (this.effectModifier.type == EN._EFFECT._SPLIT && snakeData == this.snake) {
             snakeData.split.forEach((split) => {
@@ -380,10 +235,6 @@
 
         this.stepProcID = setTimeout(this._stepMove, tick, this.snake);
       },
-      _cancelNextStep() {
-        clearTimeout(this.stepProcID);
-        this.stepProcID = NaN;
-      },
       _devourPrey(pos, snakeData) {
         snakeData.length++;
 
@@ -417,12 +268,6 @@
 
           this._scoutNewPrey();
         }
-      },
-      _scoutNewPrey(effect = PA_.DEFAULT_EFFECT) {
-        this.map.splice(this.getRandomAvailablePos(), 1, {
-            type: EN._NODE_TYPE._PREY,
-            effect: effect,
-          });
       },
       //------------------------------------------------------------------------------------------
       //  effect functions
@@ -1197,78 +1042,6 @@ for (let i = 0; i < this.effectModifier.split.length; i++) {
       //------------------------------------------------------------------------------------------
       //  primitive functions
       //------------------------------------------------------------------------------------------
-      getRandomAvailablePos() {
-        var pos;
-
-        do {
-          pos = Math.floor(Math.random() * ((this.mapSize.width * this.mapSize.height - 1) + 1));
-        } while (this.map[pos] != null);
-
-        return pos;
-      },
-      getNextPos(curPos, dir, repeatTime = 1, isContinuous = true) {
-        var nextPos = curPos;
-
-        do {
-          switch (dir) {
-            case EN._DIR._LEFT: {
-              nextPos -= 1;
-              if (isContinuous && (curPos % this.mapSize.width) == 0) {
-                nextPos += this.mapSize.width;
-              }
-              break;
-            }
-            case EN._DIR._UP: {
-              nextPos -= this.mapSize.width;
-              if (isContinuous && nextPos < 0) {
-                nextPos += (this.mapSize.width * this.mapSize.height);
-              }
-              break;
-            }
-            case EN._DIR._RIGHT: {
-              nextPos += 1;
-              if (isContinuous && (curPos % this.mapSize.width) == (this.mapSize.width - 1)) {
-                nextPos -= this.mapSize.width;
-              }
-              break;
-            }
-            case EN._DIR._DOWN: {
-              nextPos += this.mapSize.width;
-              if (isContinuous && nextPos >= (this.mapSize.width * this.mapSize.height)) {
-                nextPos -= (this.mapSize.width * this.mapSize.height);
-              }
-              break;
-            }
-          }
-        } while (--repeatTime);
-
-        return nextPos;
-      },
-      getMovingDir(fromPos, toPos) {
-      	var ret = undefined;
-
-      	switch (toPos - fromPos) {
-      		case -1:
-      		case (this.mapSize.width - 1):
-      			ret = EN._DIR._LEFT;
-      			break;
-
-      		case -this.mapSize.width:
-      		case ((this.mapSize.height - 1) * this.mapSize.width):
-      			ret = EN._DIR._UP;
-      			break;
-      		case 1:
-      		case -(this.mapSize.width - 1):
-      			ret = EN._DIR._RIGHT;
-      			break;
-      		case this.mapSize.width:
-      		case -((this.mapSize.height - 1) * this.mapSize.width):
-      			ret = EN._DIR._DOWN;
-      			break;
-      	}
-
-      	return ret;
-      },
       handleControlInput(dir) {
         switch (this.effectModifier.type) {
           case EN._EFFECT._DRUNK: {
