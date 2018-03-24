@@ -4,7 +4,7 @@
 </template>
 
 <script>
-  import * as EN_ from "../include/Enums"
+  import { _NODE_TYPE } from "../include/Enums"
 
   export default {
     props: {
@@ -23,15 +23,15 @@
         } else {
           //--- default color codes
           switch (this.data.type) {
-              case EN_.NODE_TYPE._SNAKE: {
+              case _NODE_TYPE._SNAKE: {
                 ret = this.colorSet.snake;
                 break;
               }
-              case EN_.NODE_TYPE._SNAKE_SPAN: {
+              case _NODE_TYPE._SNAKE_SPAN: {
                 ret = '#FA5838';
                 break;
               }
-              case EN_.NODE_TYPE._PREY: {
+              case _NODE_TYPE._PREY: {
                 ret = this.colorSet.prey;
                 break;
               }

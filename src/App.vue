@@ -1,12 +1,10 @@
 <template>
   <div>
-    <app-panel></app-panel>
     <app-game-map :mapSize="mapSize"></app-game-map>
   </div>
 </template>
 
 <script>
-  import ControlPanel from './components/ControlPanel.vue';
   import GameMap from './components/GameMap.vue';
 
   export default {
@@ -22,7 +20,6 @@
       }
     },
     components: {
-      appPanel: ControlPanel,
       appGameMap: GameMap
     },
     created() {
