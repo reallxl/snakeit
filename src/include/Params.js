@@ -1,4 +1,4 @@
-import { _EFFECT } from './Enums';
+import { _EFFECT } from './Enums.js';
 
 export const
   //--- map
