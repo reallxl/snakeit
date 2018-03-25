@@ -1,11 +1,9 @@
 import { EFFECT } from './Enums';
 
 export const
-  //--- size
+  //--- map
   DEFAULT_MAP_WIDTH = 20,
   DEFAULT_MAP_HEIGHT = 10,
-
-  //--- color
   DEFAULT_BG_COLOR = '#6E6E6E',
   DEFAULT_SNAKE_COLOR = '#000000',
   DEFAULT_SNAKE_HEAD_COLOR = '#FA5838',

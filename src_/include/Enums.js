@@ -48,7 +48,7 @@ export const
     _HEAD_MOVE: 2,
     _TAIL_MOVE: 3,
     _POST_STEP_MOVE: 4,
-    _APPOINTMENT: 5,
+    _SCHEDULE_NEXT_STEP: 5,
     _CTRL_INPUT: 6,
     _ACTION: 7,
     _TERMINATE: 999,

@@ -4,7 +4,7 @@
 </template>
 
 <script>
-  import { NODE_TYPE } from "../include/Enums"
+  import { _NODE_TYPE } from "../include/Enums"
 
   export default {
     props: {
