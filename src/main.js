@@ -6,4 +6,4 @@ export const EventHandler = new Vue();
 new Vue({
   el: '#app',
   render: h => h(App)
-})
+});

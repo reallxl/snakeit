@@ -1,3 +1,4 @@
+
 <template>
   <div>
     <p>
@@ -8,10 +9,9 @@
       </template>
     </p>
     <app-canvas :mapSize="mapSize" :dataMap="dataMap" :colorSet="colorSet"></app-canvas>
-    <app-processor
-      ref="Processor"
+    <app-flow-processor
       :mapSize="mapSize" :dataMap="dataMap" :snake="snake" :prey="prey"
-    ></app-processor>
+    ></app-flow-processor>
   </div>
 </template>
 
@@ -21,9 +21,10 @@
   import * as PA_ from '../include/Params'
 
   import { EventHandler } from '../main'
+  import { mapOperatorMixin } from './MapOperatorMixin'
 
   import appCanvas from './Canvas.vue'
-  import appProcessor from './Processor.vue'
+  import appFlowProcessor from './FlowProcessor.vue'
 
   export default {
     props: {
@@ -31,9 +32,10 @@
       curLevel: Number,
       mapSize: Object,
     },
+    mixins: [mapOperatorMixin],
     components: {
       appCanvas,
-      appProcessor,
+      appFlowProcessor,
     },
     data() {
       return {
@@ -43,6 +45,7 @@
           snake: PA_.DEFAULT_SNAKE_COLOR,
           prey: PA_.DEFAULT_PREY_COLOR,
         },
+
         snake: {
           length: PA_.INIT_BODY_LENGTH,
           bodyData: [],
@@ -71,7 +74,7 @@
 
         //--- hello prey!
         vm.prey.unshift({
-          pos: vm.$refs.Processor.getRandomAvailablePos(),
+          pos: this.getRandomAvailablePos(),
           effect: PA_.DEFAULT_EFFECT,
         });
 
@@ -95,8 +98,8 @@
       });
 
       EventHandler.$on('movCtrlFire', (args) => {
-        if ((vm.snake.bodyData.length == 1 && args.dir !=  vm.$refs.Processor.getMovingDir(vm.snake.bodyData[0].pos, vm.snake.trailingData[0].pos)) ||
-          (vm.snake.bodyData.length > 1 && args.dir != vm.$refs.Processor.getMovingDir(vm.snake.bodyData[0].pos, vm.snake.bodyData[1].pos))) {
+        if ((vm.snake.bodyData.length == 1 && args.dir !=  this.getMovingDir(vm.snake.bodyData[0].pos, vm.snake.trailingData[0].pos)) ||
+          (vm.snake.bodyData.length > 1 && args.dir != this.getMovingDir(vm.snake.bodyData[0].pos, vm.snake.bodyData[1].pos))) {
           vm.snake.curHeadingDir = args.dir;
         }
       });
