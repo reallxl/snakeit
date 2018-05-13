@@ -1,19 +1,14 @@
 <template>
   <div>
     <button @click="startGame" v-if="curStatus == 0/*EN_.STATUS._STOPPED*/">Start</button>
-    <button @click="pauseGame" v-else-if="curStatus == 1/*EN_.STATUS._PLAYING*/">Pause</button>
-    <button @click="resumeGame" v-else-if="curStatus == 2/*EN_.STATUS._PAUSED*/">Resume</button>
-    <button @click="stepMove" v-if="curStatus != 0/*EN_.STATUS._STOPPED*/">Step</button>
-    <button @click="resetGame">Reset</button>
+    <button @click="resetGame" v-else>Reset</button>
   </div>
 </template>
 
 <script>
   import * as EN_ from '../include/Enums'
-  import * as ME_ from '../include/Methods'
-  import * as PA_ from '../include/Params'
 
-  import { EventHandler } from '../main'
+  import { EventBus } from '../main'
 
   export default {
     props: {
@@ -32,30 +27,21 @@
       //  public APIs
       //------------------------------------------------------------------------------------------
       startGame() {
-        EventHandler.$emit('gamePreStart');
-      },
-      pauseGame() {
-        EventHandler.$emit('gamePause');
-      },
-      resumeGame() {
-        EventHandler.$emit('gameResume');
-      },
-      stepMove() {
-        EventHandler.$emit('stepMove');
+        EventBus.$emit('gameStart');
       },
       resetGame() {
-        EventHandler.$emit('gamePreReset');
+        EventBus.$emit('gameReset');
       },
       //------------------------------------------------------------------------------------------
       //  control functions
       //------------------------------------------------------------------------------------------
       handleMovementControl(dir) {
-        EventHandler.$emit('movCtrlFire', {
+        EventBus.$emit('movCtrlFire', {
           dir: dir,
         });
       },
       handleActionControl(key) {
-        EventHandler.$emit('actCtrlFire', {
+        EventBus.$emit('actCtrlFire', {
           key: key,
         });
       },

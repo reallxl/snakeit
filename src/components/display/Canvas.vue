@@ -8,7 +8,7 @@
     <tr v-for="row in mapSize.height">
       <app-pixel
         v-for="col in mapSize.width"
-        :data="dataMap[(row - 1) * mapSize.width + (col - 1)]"
+        :data="dataMap ? dataMap[(row - 1) * mapSize.width + (col - 1)] : null"
         :colorSet="colorSet"
         :key="((row - 1) * mapSize.width + (col - 1))"
       ></app-pixel>
@@ -26,8 +26,8 @@
   export default {
     props: {
       mapSize: Object,
-      dataMap: Array,
       colorSet: Object,
+      dataMap: Array,
     },
     components: {
       appPixel,

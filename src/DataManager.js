@@ -1,36 +1,41 @@
-import * as EN_ from '../include/Enums'
+import * as EN_ from './include/Enums'
 
-export const mapOperatorMixin = {
+export default {
+  data: {
+  },
   methods: {
-    getNextPos(curPos, dir, repeatTime = 1) {
+    //------------------------------------------------------------------------------------------
+    //  getNextPos
+    //------------------------------------------------------------------------------------------
+    getNextPos(curPos, dir, repeatTime = 1, isInfinite = true) {
       var nextPos = curPos;
 
       do {
         switch (dir) {
           case EN_.KEY._LEFT: {
             nextPos -= 1;
-              if ((curPos % this.mapSize.width) == 0) {
+            if (isInfinite && (curPos % this.mapSize.width) == 0) {
               nextPos += this.mapSize.width;
             }
             break;
           }
           case EN_.KEY._UP: {
             nextPos -= this.mapSize.width;
-            if (nextPos < 0) {
+            if (isInfinite && nextPos < 0) {
               nextPos += (this.mapSize.width * this.mapSize.height);
             }
             break;
           }
           case EN_.KEY._RIGHT: {
             nextPos += 1;
-            if ((curPos % this.mapSize.width) == (this.mapSize.width - 1)) {
+            if (isInfinite && (curPos % this.mapSize.width) == (this.mapSize.width - 1)) {
               nextPos -= this.mapSize.width;
             }
             break;
           }
           case EN_.KEY._DOWN: {
             nextPos += this.mapSize.width;
-            if (nextPos >= (this.mapSize.width * this.mapSize.height)) {
+            if (isInfinite && nextPos >= (this.mapSize.width * this.mapSize.height)) {
               nextPos -= (this.mapSize.width * this.mapSize.height);
             }
             break;
@@ -40,6 +45,9 @@ export const mapOperatorMixin = {
 
       return nextPos;
     },
+    //------------------------------------------------------------------------------------------
+    //  getMovingDir
+    //------------------------------------------------------------------------------------------
     getMovingDir(fromPos, toPos) {
       var ret = undefined;
 
@@ -65,6 +73,9 @@ export const mapOperatorMixin = {
 
       return ret;
     },
+    //------------------------------------------------------------------------------------------
+    //  getRandomAvailablePos
+    //------------------------------------------------------------------------------------------
     getRandomAvailablePos() {
       var pos;
 
@@ -74,11 +85,5 @@ export const mapOperatorMixin = {
 
       return pos;
     },
-    //------------------------------------------------------------------------------------------
-    //  DEBUG functions
-    //------------------------------------------------------------------------------------------
-    get2DPos(pos) {
-      return [(pos % this.mapSize.width), Math.floor(pos / this.mapSize.width)];
-    },
   },
-};
+}

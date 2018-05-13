@@ -1,6 +1,7 @@
 import { EFFECT } from './Enums';
 
 export const
+  GAME_UPDATE_TICK = 300,
   //--- size
   DEFAULT_MAP_WIDTH = 20,
   DEFAULT_MAP_HEIGHT = 10,
