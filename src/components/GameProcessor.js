@@ -21,7 +21,8 @@ GameProcessor.prototype.run = function() {
 //  stop
 //------------------------------------------------------------------------------------------
 GameProcessor.prototype.stop = function() {
-  clearTimeout(this.turnProcID);
+  let self = this;
+  clearTimeout(self.turnProcID);
   this.turnProcID = NaN;
 }
 //------------------------------------------------------------------------------------------
@@ -51,7 +52,7 @@ GameProcessor.prototype.runSingleGameTurn = function() {
       snake.updateTrailingData(snake.updateTailPos());
     }
 
-    if (snake.hasPostEffect()) {
+    if (snake.applyPostEffect) {
       snake.applyPostEffect();
     }
   });
@@ -79,8 +80,8 @@ GameProcessor.prototype.runSingleGameTurn = function() {
   });
 
   //--- schedule next frame update
-  let _this = this;
+  let self = this;
   this.turnProcID = setTimeout( function() {
-    _this.runSingleGameTurn();
+    self.runSingleGameTurn();
   }, PA_.GAME_UPDATE_TICK, this);
 }

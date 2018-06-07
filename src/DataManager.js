@@ -86,4 +86,9 @@ export default {
       return pos;
     },
   },
+  computed: {
+    dataMap: function() {
+
+    },
+  },
 }

@@ -39,6 +39,14 @@ Snake.prototype.refreshBodyEffect = function(effect) {
       this.actionSet = new NormalActionSet(this.body);
       break;
   }
+
+  //--- bypassing action methods
+  this.getNextHeadPos = this.actionSet.getNextHeadPos;
+  this.updateHeadPos = this.actionSet.updateHeadPos;
+  this.doUpdateTailPos = this.actionSet.doUpdateTailPos;
+  this.updateTailPos = this.actionSet.updateTailPos;
+  this.updateTrailingData = this.actionSet.updateTrailingData;
+  this.applyPostEffect = this.actionSet.applyPostEffect;
 };
 
 //------------------------------------------------------------------------------------------
@@ -51,18 +59,6 @@ Snake.prototype.updateMovingDir = function(dir) {
   }
 };
 //------------------------------------------------------------------------------------------
-//  getNextHeadPos
-//------------------------------------------------------------------------------------------
-Snake.prototype.getNextHeadPos = function() {
-  return this.actionSet.getNextHeadPos();
-};
-//------------------------------------------------------------------------------------------
-//  updateHeadPos
-//------------------------------------------------------------------------------------------
-Snake.prototype.updateHeadPos = function(nextHeadPos) {
-  return this.actionSet.updateHeadPos(nextHeadPos);
-};
-//------------------------------------------------------------------------------------------
 //  grow
 //------------------------------------------------------------------------------------------
 Snake.prototype.grow = function(effect) {
@@ -71,27 +67,3 @@ Snake.prototype.grow = function(effect) {
   //--- update action set based on prey effect
   this.refreshBodyEffect(effect);
 };
-//------------------------------------------------------------------------------------------
-//  doUpdateTailPos
-//------------------------------------------------------------------------------------------
-Snake.prototype.doUpdateTailPos = function() {
-  return this.actionSet.doUpdateTailPos();
-},
-//------------------------------------------------------------------------------------------
-//  updateTailPos
-//------------------------------------------------------------------------------------------
-Snake.prototype.updateTailPos = function() {
-  return this.actionSet.updateTailPos();
-};
-//------------------------------------------------------------------------------------------
-//  updateTrailingData
-//------------------------------------------------------------------------------------------
-Snake.prototype.updateTrailingData = function(lastTailData) {
-  return this.actionSet.updateTrailingData(lastTailData);
-};
-//------------------------------------------------------------------------------------------
-//  hasPostEffect
-//------------------------------------------------------------------------------------------
-Snake.prototype.hasPostEffect = function() {
-  return false;
-}
