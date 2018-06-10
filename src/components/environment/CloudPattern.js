@@ -1,12 +1,10 @@
-import { PIXEL_BLOCK_WIDTH, PIXEL_BLOCK_HEIGHT } from "../../include/Params"
-
 export default {
-  width: 4 * PIXEL_BLOCK_WIDTH,
-  height: 3 * PIXEL_BLOCK_HEIGHT,
+  width: 20,
+  height: 15,
   frameList: [
     //--- frame 0
     {
-      colorList: [
+      colorDict: [
         '#999999',
         '#CCCCCC',
         '#FFFFFF',

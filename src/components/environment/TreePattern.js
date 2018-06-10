@@ -1,13 +1,10 @@
-import { PIXEL_BLOCK_WIDTH, PIXEL_BLOCK_HEIGHT } from "../../include/Params"
-
 export default {
-  width: 2 * PIXEL_BLOCK_WIDTH,
-  height: 2 * PIXEL_BLOCK_HEIGHT,
-  curFrameNum: 0,
+  width: 10,
+  height: 10,
   frameList: [
     //--- frame 0
     {
-      colorList: [
+      colorDict: [
         '#006600',
         '#008000',
         "#009900",
@@ -28,7 +25,7 @@ export default {
     },
     //--- frame 1
     {
-      colorList: [
+      colorDict: [
         '#006600',
         '#008000',
         "#009900",

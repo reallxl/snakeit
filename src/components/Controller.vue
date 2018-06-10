@@ -8,7 +8,7 @@
 <script>
   import * as EN_ from '../include/Enums'
 
-  import { EventBus } from '../main'
+  import { appEventBus } from '../main'
 
   export default {
     props: {
@@ -27,21 +27,21 @@
       //  public APIs
       //------------------------------------------------------------------------------------------
       startGame() {
-        EventBus.$emit('gameStart');
+        appEventBus.$emit('gameStart');
       },
       resetGame() {
-        EventBus.$emit('gameReset');
+        appEventBus.$emit('gameReset');
       },
       //------------------------------------------------------------------------------------------
       //  control functions
       //------------------------------------------------------------------------------------------
       handleMovementControl(dir) {
-        EventBus.$emit('movCtrlFire', {
+        appEventBus.$emit('movCtrlFire', {
           dir: dir,
         });
       },
       handleActionControl(key) {
-        EventBus.$emit('actCtrlFire', {
+        appEventBus.$emit('actCtrlFire', {
           key: key,
         });
       },

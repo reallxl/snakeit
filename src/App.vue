@@ -2,7 +2,7 @@
   <div>
     <app-controller :curStatus="curStatus"></app-controller>
     <app-debug-panel :curStatus="curStatus" :mapSize="mapSize" :snakeList="snakeList"></app-debug-panel>
-    <app-canvas :mapSize="mapSize" :colorSet="colorSet" :dataMap="dataMap"></app-canvas>
+    <app-canvas :mapSize="mapSize" :colorSet="colorSet" :snakeList="snakeList" :preyList="preyList"></app-canvas>
   </div>
 </template>
 
@@ -10,8 +10,8 @@
   import * as EN_ from './include/Enums'
   import * as PA_ from './include/Params'
 
-  import { DataManager } from './main'
-  import { EventBus } from './main'
+  import { appDataManager } from './main'
+  import { appEventBus } from './main'
 
   import { DebugMethodMixin } from './include/DebugMethodMixin'
 
@@ -38,6 +38,10 @@
         curStatus: EN_.STATUS._STOPPED,
         curLevel: PA_.INIT_GAME_LEVEL,
         mapSize: {
+          grid: {
+            width: PA_.BLOCK_WIDTH,
+            height: PA_.BLOCK_HEIGHT,
+          },
           width: PA_.DEFAULT_MAP_WIDTH,
           height: PA_.DEFAULT_MAP_HEIGHT,
         },
@@ -49,10 +53,9 @@
         //----------------------------------------------------------------------------------------
         //  in-game data
         //----------------------------------------------------------------------------------------
-        dataMap: null,
         snakeList: [],
         preyList: [],
-        processor: null,
+        processor: undefined,
       };
     },
     methods: {
@@ -60,17 +63,14 @@
       //  startGame
       //------------------------------------------------------------------------------------------
       startGame() {
-        this.dataMap = new Array(this.mapSize.width * this.mapSize.height).fill(null);
-        DataManager.mapSize = this.mapSize;
-        DataManager.dataMap = this.dataMap;
+        appDataManager.init(this.mapSize, this.snakeList, this.preyList);
 
         this.snakeList.unshift(new Snake());
-        console.log(this.snakeList[0].body.dataList[0]);
         //--- in order to denote occupied positions by snake
         //this.dataManager.submit();
         this.preyList.unshift(new Prey());
 
-        this.processor = new GameProcessor(this.dataMap, this.snakeList, this.preyList);
+        this.processor = new GameProcessor(this.snakeList, this.preyList);
         this.processor.run();
 
         this.curStatus = EN_.STATUS._PLAYING;
@@ -93,12 +93,10 @@
       //  resetGame
       //------------------------------------------------------------------------------------------
       resetGame() {
-        this.processor.stop();
-        this.processor = null;
+        appDataManager.reset();
 
-        this.dataMap = null;
-        DataManager.mapSize = undefined;
-        DataManager.dataMap = undefined;
+        this.processor.stop();
+        this.processor = undefined;
 
         this.snakeList.length = 0;
         this.preyList.length = 0;
@@ -113,31 +111,31 @@
     created() {
       let vm = this;
 
-      /*EventBus.$on('levelChange', (args) => {
+      /*appEventBus.$on('levelChange', (args) => {
         vm.curLevel = args.level;
       });*/
-      EventBus.$on('gameStart', () => {
+      appEventBus.$on('gameStart', () => {
         vm.startGame();
       });
-      EventBus.$on('gamePause', () => {
+      appEventBus.$on('gamePause', () => {
         vm.pauseGame();
       })
-      EventBus.$on('gameResume', () => {
+      appEventBus.$on('gameResume', () => {
         vm.resumeGame();
       });
-      EventBus.$on('gameReset', () => {
+      appEventBus.$on('gameReset', () => {
         vm.resetGame();
       });
-      EventBus.$on('gameOver', (args) => {
+      appEventBus.$on('gameOver', (args) => {
         console.log('collided at:', this.get2DPos(args.pos));
         alert('Game Over!!!');
         vm.resetGame();
       });
 
-      EventBus.$on('movCtrlFire', (args) => {
+      appEventBus.$on('movCtrlFire', (args) => {
         vm.snakeList[0].updateMovingDir(args.dir);
       });
-      EventBus.$on('actCtrlFire', (args) => {
+      appEventBus.$on('actCtrlFire', (args) => {
 
       });
     }

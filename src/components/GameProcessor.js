@@ -1,10 +1,11 @@
 import * as EN_ from '../include/Enums'
 import * as PA_ from '../include/Params'
 
+import { appEventBus } from '../main'
+
 import { Prey } from './prey/Prey'
 
-export function GameProcessor(dataMap, snakeList, preyList) {
-  this.dataMap = dataMap;
+export function GameProcessor(snakeList, preyList) {
   this.snakeList = snakeList;
   this.preyList = preyList;
 
@@ -58,11 +59,10 @@ GameProcessor.prototype.runSingleGameTurn = function() {
   });
 
   //this.dataManager.submit();
-  //--- reset canvas
-  this.dataMap.fill(null);
+  appEventBus.$emit('render');
 
   //--- render snake
-  this.snakeList.forEach((snake) => {
+/*  this.snakeList.forEach((snake) => {
     snake.body.dataList.forEach((bodyNode) => {
       this.dataMap.splice(bodyNode.pos, 1, {
         type: EN_.NODE_TYPE._SNAKE,
@@ -77,7 +77,7 @@ GameProcessor.prototype.runSingleGameTurn = function() {
     this.dataMap.splice(prey.pos, 1, {
       type: EN_.NODE_TYPE._PREY,
     });
-  });
+  });*/
 
   //--- schedule next frame update
   let self = this;

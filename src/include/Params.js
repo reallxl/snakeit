@@ -3,13 +3,16 @@ import { EFFECT } from './Enums';
 export const
   GAME_UPDATE_TICK = 300,
   //--- size
+  BLOCK_WIDTH = 5,
+  BLOCK_HEIGHT = 5,
+
   DEFAULT_MAP_WIDTH = 20,
   DEFAULT_MAP_HEIGHT = 10,
 
-  PIXEL_BLOCK_WIDTH = 5,
-  PIXEL_BLOCK_HEIGHT = 5,
-
   //--- color
+  DEFAULT_COLORSET = {
+    backGround: '#6E6E6E',
+  },
   DEFAULT_BG_COLOR = '#6E6E6E',
   DEFAULT_SNAKE_COLOR = '#000000',
   DEFAULT_SNAKE_HEAD_COLOR = '#FA5838',

@@ -2,14 +2,14 @@
   <div>
     <button @click="switchAnim">Anim</button>
     <table border="0" frame="void" rules="none">
-      <!-- DEBUG --><tr><td v-for="col in mapSize.width" border="0" style="font-size: 6px;">{{ col - 1 }}</td></tr><!-- DEBUG -->
+      <!-- DEBUG --><tr><td class="debug" v-for="col in mapSize.width">{{ col - 1 }}</td></tr><!-- DEBUG -->
       <tr v-for="row in mapSize.height">
-        <app-pixel-block v-for="col in mapSize.width"
+        <component v-for="col in mapSize.width"
+          :is="blockType((row - 1) * mapSize.width + (col - 1))"
           :data="dataMap[(row - 1) * mapSize.width + (col - 1)]"
-          :colorSet="colorSet"
           :key="((row - 1) * mapSize.width + (col - 1))"
-        ></app-pixel-block>
-        <!-- DEBUG --><td border="0" style="font-size: 6px;">{{ row - 1 }}</td><!-- DEBUG -->
+        ></component>
+        <!-- DEBUG --><td class="debug">{{ row - 1 }}</td><!-- DEBUG -->
       </tr>
     </table>
   </div>
@@ -19,28 +19,30 @@
   import * as EN_ from "../../include/Enums"
   import * as PA_ from "../../include/Params"
 
-  import appPixelBlock from './PixelBlock.vue'
+  import { appEventBus } from '../../main'
 
-  import CloudPattern from '../gallery/CloudPattern'
-  import TreePattern from '../gallery/TreePattern'
+  import appColorBlock from './ColorBlock.vue'
+  import appPixelSet from './PixelSet.vue'
+
+  import CloudPattern from '../environment/CloudPattern'
+  import TreePattern from '../environment/TreePattern'
 
   export default {
     props: {
       mapSize: Object,
       colorSet: Object,
-      //snakeList: Array,
-      //PreyList: Array,
+      snakeList: Array,
+      preyList: Array,
       //itemList: Array,
     },
     components: {
-      appPixelBlock,
+      appColorBlock,
+      appPixelSet,
     },
     data() {
       return {
-        //dataMap: new Array(this.mapSize.width * this.mapSize.height).fill(null),
-        dataMap: new Array(this.mapSize.width * this.mapSize.height).fill(null),
+        dataMap: new Array(this.mapSize.width * this.mapSize.height).fill(PA_.DEFAULT_COLORSET.backGround),
         objList: [],
-        init: false,
         tick: null,
       };
     },
@@ -66,19 +68,26 @@
           }
 
           if (obj.dirList) {
+            if (obj.curOfst == undefined) {
+              obj.curOfst = {
+                x: 0,
+                y: 0,
+              }
+            }
+
             if (obj.dirList.includes(EN_.KEY._LEFT)) {
               obj.curOfst.x -= obj.speed;
 
               if (obj.curOfst.x < 0) {
                 obj.startingPos--;
-                obj.curOfst.x += PA_.PIXEL_BLOCK_WIDTH;
+                obj.curOfst.x += PA_.BLOCK_WIDTH;
               }
             } else if (obj.dirList.includes(EN_.KEY._RIGHT)) {
               obj.curOfst.x += obj.speed;
 
-              if (obj.curOfst.x >= PA_.PIXEL_BLOCK_WIDTH) {
+              if (obj.curOfst.x >= PA_.BLOCK_WIDTH) {
                 obj.startingPos++;
-                obj.curOfst.x -= PA_.PIXEL_BLOCK_WIDTH;
+                obj.curOfst.x -= PA_.BLOCK_WIDTH;
               }
             }
 
@@ -87,27 +96,54 @@
 
               if (obj.curOfst.y < 0) {
                 obj.startingPos -= PA_.DEFAULT_MAP_WIDTH;
-                obj.curOfst.y += PA_.PIXEL_BLOCK_HEIGHT;
+                obj.curOfst.y += PA_.BLOCK_HEIGHT;
               }
             } else if (obj.dirList.includes(EN_.KEY._DOWN)) {
               obj.curOfst.y += obj.speed;
 
-              if (obj.curOfst.y >= PA_.PIXEL_BLOCK_HEIGHT) {
+              if (obj.curOfst.y >= PA_.BLOCK_HEIGHT) {
                 obj.startingPos += PA_.DEFAULT_MAP_WIDTH;
-                obj.curOfst.y -= PA_.PIXEL_BLOCK_HEIGHT;
+                obj.curOfst.y -= PA_.BLOCK_HEIGHT;
               }
             }
           }
         }
       },
       render() {
-        //--- reset
-        this.dataMap.fill(null);
+        //--- default color codes
+        /*switch (this.data.type) {
+            case NODE_TYPE._SNAKE: {
+              ret = this.colorSet.snake;
+              break;
+            }
+            case NODE_TYPE._SNAKE_SPAN: {
+              ret = '#FA5838';
+              break;
+            }
+            case NODE_TYPE._PREY: {
+              ret = this.colorSet.prey;
+              break;
+            }
+        }*/
 
+        //--- reset
+        this.dataMap.fill(PA_.DEFAULT_COLORSET.backGround);
+
+        this.snakeList.forEach(snake => {
+          snake.body.dataList.forEach(bodyNode => {
+            this.dataMap.splice(bodyNode.pos, 1, snake.body.dataList.indexOf(bodyNode) == 0 ?
+              PA_.DEFAULT_SNAKE_HEAD_COLOR : PA_.DEFAULT_SNAKE_COLOR);
+          });
+        });
+
+        this.preyList.forEach(prey => this.dataMap.splice(prey.pos, 1, PA_.DEFAULT_PREY_COLOR));
+
+        //--- loop throgh all objects
         for (let o = 0; o < this.objList.length; o++) {
           let obj = this.objList[o];
           let curFrm = obj.curFrmNum ? obj.pattern.frameList[obj.curFrmNum] : obj.pattern.frameList[0];
           let curBlockData, lastBlockPos = undefined, blockDataList = [];
+          let bbb;
 
           for (let p = 0; p < curFrm.dataMap.length; p++) {
             if (curFrm.dataMap[p] == 0) {
@@ -125,51 +161,28 @@
             }
 
             //--- locate block
-            let bx = Math.floor(x / PA_.PIXEL_BLOCK_WIDTH), by = Math.floor(y / PA_.PIXEL_BLOCK_WIDTH);
+            let bx = Math.floor(x / PA_.BLOCK_WIDTH), by = Math.floor(y / PA_.BLOCK_WIDTH);
             let blockPos = obj.startingPos + (by * PA_.DEFAULT_MAP_WIDTH + bx);
 
-            if (blockPos != lastBlockPos) {
-              let block = blockDataList.find(block => block.pos == blockPos);
-              if (block) {
-                curBlockData = block.data;
-              } else {
-                if (this.dataMap[blockPos]) {
-                  curBlockData = Object.assign({}, this.dataMap[blockPos]);
-                } else {
-                  curBlockData = {
-                    width: PA_.PIXEL_BLOCK_WIDTH,
-                    height: PA_.PIXEL_BLOCK_HEIGHT,
-                    dataMap: Array(PA_.PIXEL_BLOCK_WIDTH * PA_.PIXEL_BLOCK_HEIGHT).fill(0),
-                  };
-                }
+            /*if (obj.visiblePos && ((blockPos % PA_.DEFAULT_MAP_WIDTH) < (obj.visiblePos % PA_.DEFAULT_MAP_WIDTH) ||
+              Math.floor(blockPos / PA_.DEFAULT_MAP_WIDTH) < Math.floor(obj.visiblePos / PA_.DEFAULT_MAP_WIDTH))) {
+              continue;
+            }*/
 
-                blockDataList.push({
-                  pos: blockPos,
-                  data: curBlockData,
-                });
-              }
-
-              lastBlockPos = blockPos;
+            if (this.dataMap[blockPos] instanceof Array == false) {
+              this.dataMap.splice(blockPos, 1, new Array(PA_.BLOCK_WIDTH * PA_.BLOCK_HEIGHT).fill(this.dataMap[blockPos]));
             }
 
             //--- global (map) to local (block)
-            x %= PA_.PIXEL_BLOCK_WIDTH;
-            y %= PA_.PIXEL_BLOCK_HEIGHT;
+            x %= PA_.BLOCK_WIDTH;
+            y %= PA_.BLOCK_HEIGHT;
 
-            curBlockData.dataMap[y * PA_.PIXEL_BLOCK_WIDTH + x] = curFrm.colorList[curFrm.dataMap[p] - 1];
-          }
-
-          for (let b = 0; b < blockDataList.length; b++) {
-            if (obj.visiblePos == undefined || obj.startingPos >= obj.visiblePos ||
-              // ??????????????????????????????????????????????????
-              // ??????????????????????????????????????????????????
-              // ??????????????????????????????????????????????????
-              ((blockDataList[b].pos % PA_.DEFAULT_MAP_WIDTH) >= (obj.visiblePos % PA_.DEFAULT_MAP_WIDTH) &&
-              (blockDataList[b].pos % PA_.DEFAULT_MAP_WIDTH) >= (obj.visiblePos % PA_.DEFAULT_MAP_WIDTH))) {
-                this.dataMap.splice(blockDataList[b].pos, 1, blockDataList[b].data);
-            }
+            this.dataMap[blockPos].splice(y * PA_.BLOCK_WIDTH + x, 1, curFrm.colorDict[curFrm.dataMap[p] - 1]);
           }
         }
+      },
+      blockType(idx) {
+        return this.dataMap[idx] instanceof Array ? 'appPixelSet' : 'appColorBlock';
       },
     },
     computed: {
@@ -187,21 +200,28 @@
         startingPos: 96,
         visiblePos: 100,
         endingPos: 100,
-        curOfst: {
-          x: 0,
-          y: 0,
-        },
         dirList: [
-          EN_.KEY._UP,
-          EN_.KEY._LEFT,
+          EN_.KEY._RIGHT,
         ],
-        speed: 3,
+        speed: 1,
       });
-      //vm.render(vm.cloud);
-      //vm.render(vm.tree);
+
+      appEventBus.$on('render', () => {
+        vm.refresh();
+        vm.render();
+      });
     }
   }
 </script>
 
 <style>
+td {
+  border: 0;
+  padding: 0 0 0 0;
+}
+
+td.debug {
+  border: 0;
+  font-size: 10px;
+}
 </style>

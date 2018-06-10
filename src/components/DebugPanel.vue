@@ -20,7 +20,7 @@
 </template>
 
 <script>
-  import { EventBus } from '../main'
+  import { appEventBus } from '../main'
 
   export default {
     props: {
@@ -35,13 +35,13 @@
     },
     methods: {
       pauseGame() {
-        EventBus.$emit('gamePause');
+        appEventBus.$emit('gamePause');
       },
       resumeGame() {
-        EventBus.$emit('gameResume');
+        appEventBus.$emit('gameResume');
       },
       stepMove() {
-        EventBus.$emit('stepMove');
+        appEventBus.$emit('stepMove');
       },
     },
     created() {

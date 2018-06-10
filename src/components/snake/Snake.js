@@ -1,7 +1,7 @@
 import * as EN_ from '../../include/Enums'
 import * as PA_ from '../../include/Params'
 
-import { DataManager } from '../../main'
+import { appDataManager } from '../../main'
 
 import { NormalActionSet } from './NormalActionSet'
 import { ReversedActionSet } from './ReversedActionSet'
@@ -53,8 +53,8 @@ Snake.prototype.refreshBodyEffect = function(effect) {
 //  updateMovingDir
 //------------------------------------------------------------------------------------------
 Snake.prototype.updateMovingDir = function(dir) {
-  if ((this.body.dataList.length == 1 && dir != DataManager.getMovingDir(this.body.dataList[0].pos, this.trailingData[0].pos)) ||
-    (this.body.dataList.length > 1 && dir != DataManager.getMovingDir(this.body.dataList[0].pos, this.body.dataList[1].pos))) {
+  if ((this.body.dataList.length == 1 && dir != appDataManager.getMovingDir(this.body.dataList[0].pos, this.trailingData[0].pos)) ||
+    (this.body.dataList.length > 1 && dir != appDataManager.getMovingDir(this.body.dataList[0].pos, this.body.dataList[1].pos))) {
     this.body.curMovingDir = dir;
   }
 };

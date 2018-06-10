@@ -1,7 +1,7 @@
 import * as EN_ from '../../include/Enums'
 
-import { DataManager } from '../../main'
-import { EventBus } from '../../main'
+import { appDataManager } from '../../main'
+import { appEventBus } from '../../main'
 
 export function NormalActionSet(body) {
   this.body = body;
@@ -13,7 +13,7 @@ export function NormalActionSet(body) {
 NormalActionSet.prototype.getNextHeadPos = function() {
   let nextHeadPos;
   if (this.body.dataList.length) {
-    nextHeadPos = DataManager.getNextPos(this.body.dataList[0].pos, this.body.curMovingDir);
+    nextHeadPos = appDataManager.getNextPos(this.body.dataList[0].pos, this.body.curMovingDir);
   } else {
     //--- default
     nextHeadPos = 0;
@@ -23,7 +23,7 @@ NormalActionSet.prototype.getNextHeadPos = function() {
   if (this.body.dataList.find((bodyNode) => {
     return bodyNode.pos == nextHeadPos;
   })) {
-    return EventBus.$emit('gameOver', {
+    return appEventBus.$emit('gameOver', {
       pos: nextHeadPos,
     });
   }
