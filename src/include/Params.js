@@ -23,7 +23,7 @@ export const
   INIT_GAME_LEVEL = 8,
   INIT_BODY_LENGTH = 10,
   INIT_TRAILING_LENGTH = 1,
-  DEFAULT_EFFECT = EFFECT._REVERSED,
+  DEFAULT_EFFECT = EFFECT._ELASTIC,
 
   //--- effect parameters
   DRUNK_LEVEL = [0.33, 0.83, 1, 1, 2, 2],

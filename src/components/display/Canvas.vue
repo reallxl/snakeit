@@ -22,7 +22,7 @@
   import { appEventBus } from '../../main'
 
   import appColorBlock from './ColorBlock.vue'
-  import appPixelSet from './PixelSet.vue'
+  import appPixelBlock from './PixelBlock.vue'
 
   import CloudPattern from '../environment/CloudPattern'
   import TreePattern from '../environment/TreePattern'
@@ -37,7 +37,7 @@
     },
     components: {
       appColorBlock,
-      appPixelSet,
+      appPixelBlock,
     },
     data() {
       return {
@@ -182,7 +182,7 @@
         }
       },
       blockType(idx) {
-        return this.dataMap[idx] instanceof Array ? 'appPixelSet' : 'appColorBlock';
+        return this.dataMap[idx] instanceof Array ? 'appPixelBlock' : 'appColorBlock';
       },
     },
     computed: {

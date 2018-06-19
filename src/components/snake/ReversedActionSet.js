@@ -2,6 +2,9 @@ import { appDataManager } from '../../main'
 
 import { NormalActionSet } from './NormalActionSet'
 
+//------------------------------------------------------------------------------------------
+//  ReversedActionSet
+//------------------------------------------------------------------------------------------
 export function ReversedActionSet(body) {
   NormalActionSet.call(this, body);
 
@@ -19,5 +22,4 @@ export function ReversedActionSet(body) {
     pos: nextHeadPos,
   }];
 }
-
 ReversedActionSet.prototype = Object.create(NormalActionSet.prototype);

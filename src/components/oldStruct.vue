@@ -1,19 +1,4 @@
 <template>
-  <div>
-    <button @click="startGame" v-if="snake.bodyData.length == 0">Start</button>
-    <button @click="pauseGame" v-else-if="!isNaN(stepProcID)">Pause</button>
-    <button @click="resumeGame" v-else>Resume</button>
-    <button @click="_stepMove(snake, false)" v-if="snake.bodyData.length && isNaN(stepProcID)">Step</button>
-    <button @click="resetGame">Reset</button>
-    <p>
-      body: {{ snake.length }} shown: {{ snake.bodyData.length }} status: {{ effectModifier.type }}
-      <template v-if="snake.bodyData.length != 0">
-        head: ({{ snake.bodyData[0].pos % this.mapSize.width }}, {{ Math.floor(snake.bodyData[0].pos / this.mapSize.width) }})
-        tail: ({{ snake.bodyData[snake.bodyData.length - 1].pos % this.mapSize.width }}, {{ Math.floor(snake.bodyData[snake.bodyData.length - 1].pos / this.mapSize.width) }})
-      </template>
-    </p>
-    <app-canvas :mapSize="mapSize" :map="map" :colorSet="colorSet"></app-canvas>
-  </div>
 </template>
 
 <script>
@@ -32,22 +17,7 @@
     },
     data() {
       return {
-        stepProcID: NaN,
-        curLevel: PA_.INIT_GAME_LEVEL,
-        map: new Array(this.mapSize.width * this.mapSize.height).fill(null),
-        colorSet: {
-          backGround: PA_.DEFAULT_BG_COLOR,
-          snake: PA_.DEFAULT_SNAKE_COLOR,
-          prey: PA_.DEFAULT_PREY_COLOR,
-        },
-        snake: {
-          length: PA_.INIT_BODY_LENGTH,
-          bodyData: [],
-          trailingLength: PA_.INIT_TRAILING_LENGTH,
-          trailingData: [],
-          curHeadingDir: EN._DIR._RIGHT,
-        },
-        effectModifier: undefined,
+
       };
     },
     methods: {
@@ -85,10 +55,6 @@
               nextHeadPos = this._applyDimensionalEffect({
                 action: EN._PHASE._HEAD_MOVE,
               });
-            } else if (this.effectModifier.type == EN._EFFECT._WORMLIKE && this._applyWormlikeEffect({
-                action: EN._PHASE._HEAD_MOVE,
-              })) {
-              break;
             } else {
               nextHeadPos = this.getNextPos(snakeData.bodyData[0].pos, snakeData.curHeadingDir);
             }
@@ -181,10 +147,7 @@
           //--- phase 2: tail move
           do {
             //--- update tail iff the body is completely in the map
-            if (snakeData.bodyData.length > snakeData.length ||
-              (this.effectModifier.type == EN._EFFECT._WORMLIKE && this._applyWormlikeEffect({
-                  action: EN._PHASE._TAIL_MOVE,
-                }))) {
+            if (snakeData.bodyData.length > snakeData.length) {
               //--- tail move
               if (this.effectModifier.type == EN._EFFECT._MUTANT) {
                 this._applyMutantEffect({
@@ -259,9 +222,6 @@
               }); break;
             case EN._EFFECT._EARTHQUAKE: this._applyEarthQuakeEffect(); break;
             case EN._EFFECT._BOMBER: this._applyBomberEffect({
-                action: EN._PHASE._INIT,
-              }); break;
-            case EN._EFFECT._WORMLIKE: this._applyWormlikeEffect({
                 action: EN._PHASE._INIT,
               }); break;
           }
@@ -352,15 +312,6 @@
             return (this.effectModifier.drunkFactor < 0);
           }
         }
-      },
-      _applyUpsideDownEffect(arg) {
-        if (this.effectModifier.type != EN._EFFECT._UPSIDEDOWN) {
-          this.effectModifier = {
-            type: EN._EFFECT._UPSIDEDOWN,
-          };
-        }
-
-        return ME_.reverseDir(arg.dir);
       },
       _applyHypedEffect(arg) {
         if (this.effectModifier.type != EN._EFFECT._HYPED) {
@@ -1015,30 +966,6 @@ for (let i = 0; i < this.effectModifier.split.length; i++) {
           }
         }
       },
-      _applyWormlikeEffect(arg) {
-        switch (arg.action) {
-          case EN._PHASE._INIT: {
-            if (this.effectModifier.type != EN._EFFECT._WORMLIKE) {
-              this.effectModifier = {
-                type: EN._EFFECT._WORMLIKE,
-                isShrinking: true,
-              };
-            }
-
-            break;
-          }
-          case EN._PHASE._PHASE: {
-            this.effectModifier.isShrinking = !this.effectModifier.isShrinking;
-            break;
-          }
-          case EN._PHASE._HEAD_MOVE: {
-            return this.effectModifier.isShrinking;
-          }
-          case EN._PHASE._TAIL_MOVE: {
-            return (this.effectModifier.isShrinking && this.snake.bodyData.length > 1);
-          }
-        }
-      },
       //------------------------------------------------------------------------------------------
       //  primitive functions
       //------------------------------------------------------------------------------------------
@@ -1064,21 +991,12 @@ for (let i = 0; i < this.effectModifier.split.length; i++) {
             }
             break;
           }
-          case EN._EFFECT._UPSIDEDOWN: {
-            dir = this._applyUpsideDownEffect({
-              dir: dir,
-            });
-            break;
-          }
         }
 
         if ((this.snake.bodyData.length == 1 && dir !=  this.getMovingDir(this.snake.bodyData[0].pos, this.snake.trailingData[0].pos)) ||
           (this.snake.bodyData.length > 1 && dir != this.getMovingDir(this.snake.bodyData[0].pos, this.snake.bodyData[1].pos))) {
           this.snake.curHeadingDir = dir;
         }
-      },
-      DBGPOS(pos) {
-        return [(pos % this.mapSize.width), Math.floor(pos / this.mapSize.width)];
       },
     },
     created() {
@@ -1100,10 +1018,6 @@ for (let i = 0; i < this.effectModifier.split.length; i++) {
             });
           } else if (vm.effectModifier.type == EN._EFFECT._DIMENSIONAL) {
             vm._applyDimensionalEffect({
-              action: EN._PHASE._PHASE,
-            });
-          } else if (vm.effectModifier.type == EN._EFFECT._WORMLIKE) {
-            vm._applyWormlikeEffect({
               action: EN._PHASE._PHASE,
             });
           }

@@ -3,6 +3,9 @@ import * as PA_ from '../../include/Params'
 
 import { appDataManager } from '../../main'
 
+//------------------------------------------------------------------------------------------
+//  Prey
+//------------------------------------------------------------------------------------------
 export function Prey({
   pos = null,
   effect = PA_.DEFAULT_EFFECT,

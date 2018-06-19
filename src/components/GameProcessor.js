@@ -5,13 +5,15 @@ import { appEventBus } from '../main'
 
 import { Prey } from './prey/Prey'
 
+//------------------------------------------------------------------------------------------
+//  GameProcessor
+//------------------------------------------------------------------------------------------
 export function GameProcessor(snakeList, preyList) {
   this.snakeList = snakeList;
   this.preyList = preyList;
 
   this.turnProcID = NaN;
 }
-
 //------------------------------------------------------------------------------------------
 //  run
 //------------------------------------------------------------------------------------------
@@ -35,7 +37,9 @@ GameProcessor.prototype.runSingleGameTurn = function() {
   this.snakeList.forEach((snake) => {
     //--- advance snake head position
     let nextHeadPos = snake.getNextHeadPos();
-    snake.updateHeadPos(nextHeadPos);
+    if (nextHeadPos != undefined) {
+      snake.updateHeadPos(nextHeadPos);
+    }
 
     //--- apply action effect upon preying
     let eatenPrey = this.preyList.find((prey) => {

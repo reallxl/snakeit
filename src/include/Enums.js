@@ -31,15 +31,15 @@ export const
     _UPSIDEDOWN: 3,       //--- 17/12/25 //--- 18/01/13
     _HYPED: 4,            //--- 17/12/25 //--- 18/01/13
     _CHAMELEONIC: 5,      //--- 17/12/25 //--- 18/01/14
-    _ENLARGED: 6,         //--- 18/03/11 beta
+    _POISONED: 6,         //--- 18/03/11 beta
     _MUTANT: 7,           //--- 18/02/04
     _SPLIT: 8,            //--- 18/03/11
     _CIRCULATED: 9,       //--- 18/02/07
     _FROZEN: 10,          //--- 17/12/26 //--- 18/01/14 //--- 18/02/04
     _DIMENSIONAL: 11,     //--- 18/02/05
-    _EARTHQUAKE: 12,      //--- 18/02/08
-    _BOMBER: 13,          //--- 18/02/04
-    _WORMLIKE: 14,        //--- 18/03/11
+    _TREMBLING: 12,       //--- 18/02/08
+    _TIMEBOMB: 13,        //--- 18/02/04
+    _ELASTIC: 14,         //--- 18/03/11
   }),
   //--- effect action
   PHASE = Object.freeze({

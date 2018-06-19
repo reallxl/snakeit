@@ -1,5 +1,7 @@
+import * as EN_ from './Enums'
+
 export function reverseDir(dir) {
-  return ((dir + 2) % 4);
+  return (EN_.KEY._LEFT + (((dir - EN_.KEY._LEFT) + 2) % 4));
 }
 
 export function shuffleArr(arr) {

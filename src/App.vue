@@ -136,7 +136,7 @@
         vm.snakeList[0].updateMovingDir(args.dir);
       });
       appEventBus.$on('actCtrlFire', (args) => {
-
+        vm.snakeList[0].handleCtrl(args.key);
       });
     }
   }

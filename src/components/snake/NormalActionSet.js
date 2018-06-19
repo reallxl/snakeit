@@ -3,15 +3,18 @@ import * as EN_ from '../../include/Enums'
 import { appDataManager } from '../../main'
 import { appEventBus } from '../../main'
 
+//------------------------------------------------------------------------------------------
+//  NormalActionSet
+//------------------------------------------------------------------------------------------
 export function NormalActionSet(body) {
   this.body = body;
 }
-
 //------------------------------------------------------------------------------------------
 //  getNextHeadPos
 //------------------------------------------------------------------------------------------
 NormalActionSet.prototype.getNextHeadPos = function() {
   let nextHeadPos;
+
   if (this.body.dataList.length) {
     nextHeadPos = appDataManager.getNextPos(this.body.dataList[0].pos, this.body.curMovingDir);
   } else {
@@ -72,4 +75,10 @@ NormalActionSet.prototype.updateTrailingData = function(lastTailData) {
   if (this.body.trailingDataList.length > this.body.trailingLength) {
     this.body.trailingDataList.pop();
   }
+}
+//------------------------------------------------------------------------------------------
+//  handleCtrl
+//------------------------------------------------------------------------------------------
+NormalActionSet.prototype.handleCtrl = function(key) {
+  //--- dummy
 }
