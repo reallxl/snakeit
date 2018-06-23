@@ -10,6 +10,30 @@ export function NormalActionSet(body) {
   this.body = body;
 }
 //------------------------------------------------------------------------------------------
+//  applyEffect
+//------------------------------------------------------------------------------------------
+NormalActionSet.prototype.applyEffect = function() {
+  //--- dummy
+}
+//------------------------------------------------------------------------------------------
+//  handleMovCtrl
+//------------------------------------------------------------------------------------------
+NormalActionSet.prototype.handleMovCtrl = function(dir) {
+  if (this.body.dataList.length == 1) {
+    console.log(this.body.trailingDataList.length);
+  }
+  if ((this.body.dataList.length == 1 && dir != appDataManager.getMovingDir(this.body.dataList[0].pos, this.body.trailingDataList[0].pos)) ||
+    (this.body.dataList.length > 1 && dir != appDataManager.getMovingDir(this.body.dataList[0].pos, this.body.dataList[1].pos))) {
+    this.body.curMovingDir = dir;
+  }
+}
+//------------------------------------------------------------------------------------------
+//  handleActCtrl
+//------------------------------------------------------------------------------------------
+NormalActionSet.prototype.handleActCtrl = function(key) {
+  //--- dummy
+}
+//------------------------------------------------------------------------------------------
 //  getNextHeadPos
 //------------------------------------------------------------------------------------------
 NormalActionSet.prototype.getNextHeadPos = function() {
@@ -22,13 +46,19 @@ NormalActionSet.prototype.getNextHeadPos = function() {
     nextHeadPos = 0;
   }
 
-  //--- colliding (i.e. GAME OVER)
+  return nextHeadPos;
+}
+//------------------------------------------------------------------------------------------
+//  isColliding
+//------------------------------------------------------------------------------------------
+NormalActionSet.prototype.isColliding = function(nextHeadPos) {
+  let ret = false;
+
   if (this.body.dataList.find((bodyNode) => {
     return bodyNode.pos == nextHeadPos;
   })) {
-    return appEventBus.$emit('gameOver', {
-      pos: nextHeadPos,
-    });
+    //--- colliding (i.e. GAME OVER)
+    ret = true;
   }
   /*if (nextHeadPos == snakeData.curTailPos && snakeData.curLength == snakeData.length) {
     newData = Object.assign({}, this.dataMap[snakeData.curHeadPos]);
@@ -41,7 +71,7 @@ NormalActionSet.prototype.getNextHeadPos = function() {
     break;
   }*/
 
-  return nextHeadPos;
+  return ret;
 }
 //------------------------------------------------------------------------------------------
 //  updateHeadPos
@@ -53,9 +83,9 @@ NormalActionSet.prototype.updateHeadPos = function(nextHeadPos) {
   });
 }
 //------------------------------------------------------------------------------------------
-//  doUpdateTailPos
+//  shouldUpdateTailPos
 //------------------------------------------------------------------------------------------
-NormalActionSet.prototype.doUpdateTailPos = function() {
+NormalActionSet.prototype.shouldUpdateTailPos = function() {
   return this.body.dataList.length > this.body.length;
 }
 //------------------------------------------------------------------------------------------
@@ -77,8 +107,8 @@ NormalActionSet.prototype.updateTrailingData = function(lastTailData) {
   }
 }
 //------------------------------------------------------------------------------------------
-//  handleCtrl
+//  applyPostEffect
 //------------------------------------------------------------------------------------------
-NormalActionSet.prototype.handleCtrl = function(key) {
+NormalActionSet.prototype.applyPostEffect = function() {
   //--- dummy
 }

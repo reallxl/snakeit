@@ -47,17 +47,7 @@
             let nextHeadPos, curPrey = undefined;
 
             //--- determine next head position
-            if (this.effectModifier.type == EN._EFFECT._CIRCULATED) {
-              nextHeadPos = this._applyCirculatedEffect({
-                action: EN._PHASE._HEAD_MOVE,
-              });
-            } else if (this.effectModifier.type == EN._EFFECT._DIMENSIONAL) {
-              nextHeadPos = this._applyDimensionalEffect({
-                action: EN._PHASE._HEAD_MOVE,
-              });
-            } else {
-              nextHeadPos = this.getNextPos(snakeData.bodyData[0].pos, snakeData.curHeadingDir);
-            }
+            nextHeadPos = this.getNextPos(snakeData.bodyData[0].pos, snakeData.curHeadingDir);
 
             let isColliding = false;
 
@@ -206,7 +196,6 @@
         } else {
           //--- apply new prey effects
           switch (this.map[pos].effect) {
-            case EN._EFFECT._REVERSED: this._applyReversedEffect(); break;
             case EN._EFFECT._ENLARGED: this._applyEnlargedEffect({
                 action: EN._PHASE._INIT,
               }); break;
@@ -216,9 +205,6 @@
             case EN._EFFECT._SPLIT: this._applySplitEffect({
                 action: EN._PHASE._INIT,
                 snakeData: snakeData,
-              }); break;
-            case EN._EFFECT._CIRCULATED: this._applyCirculatedEffect({
-                action: EN._PHASE._INIT,
               }); break;
             case EN._EFFECT._EARTHQUAKE: this._applyEarthQuakeEffect(); break;
             case EN._EFFECT._BOMBER: this._applyBomberEffect({
@@ -232,35 +218,6 @@
       //------------------------------------------------------------------------------------------
       //  effect functions
       //------------------------------------------------------------------------------------------
-      _applyReversedEffect(arg) {
-        if (this.effectModifier.type != EN._EFFECT._REVERSED) {
-          this.effectModifier = {
-            type: EN._EFFECT._REVERSED,
-          };
-        }
-
-        if (this.snake.length > this.snake.bodyData.length) {
-          //--- update total body length if needed
-          this.snake.length = this.snake.bodyData.length;
-        }
-
-        //--- predict virtual trailing data
-        var nextHeadPos = this.getNextPos(this.snake.bodyData[0].pos, this.snake.curHeadingDir);
-
-        this.snake.curHeadingDir = this.getMovingDir(this.snake.bodyData[this.snake.bodyData.length - 1].pos, this.snake.trailingData[0].pos);
-        this.snake.bodyData.reverse();
-        this.snake.trailingData = [{
-          pos: nextHeadPos,
-        }];
-
-        this.map.splice(this.snake.bodyData[0].pos, 1, {
-          type: EN._NODE_TYPE._SNAKE,
-          color: PA_.DEFAULT_SNAKE_HEAD_COLOR,
-        });
-        this.map.splice(this.snake.bodyData[this.snake.bodyData.length - 1].pos, 1, {
-          type: EN._NODE_TYPE._SNAKE,
-        });
-      },
       _applyDrunkEffect(arg) {
         switch (arg.action) {
           case EN._PHASE._INIT: {
@@ -755,38 +712,6 @@ for (let i = 0; i < this.effectModifier.split.length; i++) {
           }
         }
       },
-      _applyCirculatedEffect(arg) {
-        switch (arg.action) {
-          case EN._PHASE._INIT: {
-            if (this.effectModifier.type != EN._EFFECT._CIRCULATED) {
-              this.effectModifier = {
-                type: EN._EFFECT._CIRCULATED,
-                curDegree: 45,
-              };
-            }
-
-            this.effectModifier.curDegree = (this.effectModifier.curDegree + 45) % 360;
-            break;
-          }
-          case EN._PHASE._HEAD_MOVE: {
-            let nextHeadPos;
-
-            if (this.effectModifier.curDegree % 90 == 0) {
-              nextHeadPos = this.getNextPos(this.snake.bodyData[0].pos,
-                (this.snake.curHeadingDir + (this.effectModifier.curDegree / 90)) % 4);
-            } else {
-              let curHeadingDirHalfVec = (this.snake.curHeadingDir + ((this.effectModifier.curDegree - 45) / 90)) % 4;
-              nextHeadPos = this.getNextPos(this.getNextPos(this.snake.bodyData[0].pos, curHeadingDirHalfVec), (curHeadingDirHalfVec + 1) % 4);
-            }
-
-            return nextHeadPos;
-          }
-          case EN._PHASE._PHASE: {
-            this.effectModifier.curDegree = (this.effectModifier.curDegree + 45) % 360;
-            break;
-          }
-        }
-      },
       _applyFrozenEffect(arg) {
         var ret = false;
 
@@ -849,36 +774,6 @@ for (let i = 0; i < this.effectModifier.split.length; i++) {
         }
 
         return ret;
-      },
-      _applyDimensionalEffect(arg) {
-        switch (arg.action) {
-          case EN._PHASE._INIT: {
-            if (this.effectModifier.type != EN._EFFECT._DIMENSIONAL) {
-              this.effectModifier = {
-                type: EN._EFFECT._DIMENSIONAL,
-              };
-            }
-
-            break;
-          }
-          case EN._PHASE._PHASE: {
-            this.nextHeadPos = this.getRandomAvailablePos();
-
-            break;
-          }
-          case EN._PHASE._HEAD_MOVE: {
-            let ret;
-
-            if (this.nextHeadPos) {
-              ret = this.nextHeadPos;
-              this.nextHeadPos = undefined;
-            } else {
-              ret = this.getNextPos(this.snake.bodyData[0].pos, this.snake.curHeadingDir);
-            }
-
-            return ret;
-          }
-        }
       },
       _applyEarthQuakeEffect(arg) {
         if (this.effectModifier.type != EN._EFFECT._EARTHQUAKE) {
@@ -1011,14 +906,6 @@ for (let i = 0; i < this.effectModifier.split.length; i++) {
             vm._applySplitEffect({
               action: EN._PHASE._PHASE,
               key: event.keyCode,
-            });
-          } else if (vm.effectModifier.type == EN._EFFECT._CIRCULATED) {
-            vm._applyCirculatedEffect({
-              action: EN._PHASE._PHASE,
-            });
-          } else if (vm.effectModifier.type == EN._EFFECT._DIMENSIONAL) {
-            vm._applyDimensionalEffect({
-              action: EN._PHASE._PHASE,
             });
           }
         } else {

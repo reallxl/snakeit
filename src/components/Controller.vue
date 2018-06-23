@@ -35,12 +35,12 @@
       //------------------------------------------------------------------------------------------
       //  control functions
       //------------------------------------------------------------------------------------------
-      handleMovementControl(dir) {
+      handleMovCtrl(dir) {
         appEventBus.$emit('movCtrlFire', {
           dir: dir,
         });
       },
-      handleActionControl(key) {
+      handleActCtrl(key) {
         appEventBus.$emit('actCtrlFire', {
           key: key,
         });
@@ -61,13 +61,13 @@
           case EN_.KEY._RIGHT:
           case EN_.KEY._DOWN:
             event.preventDefault();
-            vm.handleMovementControl(event.keyCode);
+            vm.handleMovCtrl(event.keyCode);
             break;
           case EN_.KEY._BTN_A:
           case EN_.KEY._BTN_B:
           case EN_.KEY._BTN_C:
             event.preventDefault();
-            vm.handleActionControl(event.keyCode);
+            vm.handleActCtrl(event.keyCode);
             break;
 
           default:

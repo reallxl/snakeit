@@ -9,6 +9,7 @@ import { NormalActionSet } from './NormalActionSet'
 //------------------------------------------------------------------------------------------
 export function ElasticActionSet(body) {
   NormalActionSet.call(this, body);
+
   this.body.isShrinking = true;
 }
 ElasticActionSet.prototype = Object.create(NormalActionSet.prototype);
@@ -25,15 +26,15 @@ ElasticActionSet.prototype.getNextHeadPos = function() {
   return nextHeadPos;
 }
 //------------------------------------------------------------------------------------------
-//  doUpdateTailPos
+//  shouldUpdateTailPos
 //------------------------------------------------------------------------------------------
-ElasticActionSet.prototype.doUpdateTailPos = function() {
-  return (this.body.isShrinking && this.body.dataList.length > 1) || NormalActionSet.prototype.doUpdateTailPos.call(this);
+ElasticActionSet.prototype.shouldUpdateTailPos = function() {
+  return (this.body.isShrinking && this.body.dataList.length > 1) || NormalActionSet.prototype.shouldUpdateTailPos.call(this);
 }
 //------------------------------------------------------------------------------------------
-//  handleCtrl
+//  handleActCtrl
 //------------------------------------------------------------------------------------------
-ElasticActionSet.prototype.handleCtrl = function(key) {
+ElasticActionSet.prototype.handleActCtrl = function(key) {
   switch (key) {
     case EN_.KEY._BTN_A:
       this.body.isShrinking = !this.body.isShrinking;

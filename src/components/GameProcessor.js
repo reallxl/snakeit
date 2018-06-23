@@ -10,6 +10,8 @@ import { Prey } from './prey/Prey'
 //------------------------------------------------------------------------------------------
 export function GameProcessor(snakeList, preyList) {
   this.snakeList = snakeList;
+  this.curActiveSnakeId = 0;
+
   this.preyList = preyList;
 
   this.turnProcID = NaN;
@@ -37,7 +39,13 @@ GameProcessor.prototype.runSingleGameTurn = function() {
   this.snakeList.forEach((snake) => {
     //--- advance snake head position
     let nextHeadPos = snake.getNextHeadPos();
-    if (nextHeadPos != undefined) {
+    
+    if (snake.isColliding(nextHeadPos)) {
+      //--- colliding (i.e. GAME OVER)
+      return appEventBus.$emit('gameOver', {
+        pos: nextHeadPos,
+      });
+    } else if (nextHeadPos != undefined) {
       snake.updateHeadPos(nextHeadPos);
     }
 
@@ -45,6 +53,7 @@ GameProcessor.prototype.runSingleGameTurn = function() {
     let eatenPrey = this.preyList.find((prey) => {
       return prey.pos == nextHeadPos;
     });
+
     if (eatenPrey) {
       snake.grow(eatenPrey.effect);
 
@@ -53,13 +62,11 @@ GameProcessor.prototype.runSingleGameTurn = function() {
     }
 
     //--- advance snake tail position
-    if (snake.doUpdateTailPos()) {
+    if (snake.shouldUpdateTailPos()) {
       snake.updateTrailingData(snake.updateTailPos());
     }
 
-    if (snake.applyPostEffect) {
-      snake.applyPostEffect();
-    }
+    snake.applyPostEffect();
   });
 
   //this.dataManager.submit();
@@ -88,4 +95,16 @@ GameProcessor.prototype.runSingleGameTurn = function() {
   this.turnProcID = setTimeout( function() {
     self.runSingleGameTurn();
   }, PA_.GAME_UPDATE_TICK, this);
+}
+//------------------------------------------------------------------------------------------
+//  handleMovCtrl
+//------------------------------------------------------------------------------------------
+GameProcessor.prototype.handleMovCtrl = function(dir) {
+  this.snakeList[this.curActiveSnakeId].handleMovCtrl(dir);
+}
+//------------------------------------------------------------------------------------------
+//  handleActCtrl
+//------------------------------------------------------------------------------------------
+GameProcessor.prototype.handleActCtrl = function(key) {
+  this.snakeList[this.curActiveSnakeId].handleActCtrl(key);
 }

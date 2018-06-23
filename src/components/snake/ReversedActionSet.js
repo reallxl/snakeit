@@ -7,7 +7,12 @@ import { NormalActionSet } from './NormalActionSet'
 //------------------------------------------------------------------------------------------
 export function ReversedActionSet(body) {
   NormalActionSet.call(this, body);
-
+}
+ReversedActionSet.prototype = Object.create(NormalActionSet.prototype);
+//------------------------------------------------------------------------------------------
+//  applyEffect
+//------------------------------------------------------------------------------------------
+ReversedActionSet.prototype.applyEffect = function() {
   //--- update total body length if needed
   if (this.body.length > this.body.dataList.length) {
     this.body.length = this.body.dataList.length;
@@ -22,4 +27,3 @@ export function ReversedActionSet(body) {
     pos: nextHeadPos,
   }];
 }
-ReversedActionSet.prototype = Object.create(NormalActionSet.prototype);

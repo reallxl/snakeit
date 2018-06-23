@@ -133,10 +133,10 @@
       });
 
       appEventBus.$on('movCtrlFire', (args) => {
-        vm.snakeList[0].updateMovingDir(args.dir);
+        vm.processor.handleMovCtrl(args.dir);
       });
       appEventBus.$on('actCtrlFire', (args) => {
-        vm.snakeList[0].handleCtrl(args.key);
+        vm.processor.handleActCtrl(args.key);
       });
     }
   }

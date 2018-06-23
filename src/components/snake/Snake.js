@@ -37,8 +37,8 @@ export function Snake({
     trailingLength: trailingLength,
     trailingDataList: trailingDataList,
   };
-  this.actionSet = undefined;
 
+  this.effect = this.actionSet = undefined;
   this.updateBodyEffect(effect);
 }
 //------------------------------------------------------------------------------------------
@@ -55,80 +55,111 @@ Snake.prototype.grow = function(effect) {
 //------------------------------------------------------------------------------------------
 Snake.prototype.updateBodyEffect = function(effect) {
   //--- update action set based on prey effect
-  switch (effect) {
-    case EN_.EFFECT._REVERSED:
-      this.actionSet = new ReversedActionSet(this.body);
-      break;
-    case EN_.EFFECT._DRUNK:
-      this.actionSet = new DrunkActionSet(this.body);
-      break;
-    case EN_.EFFECT._UPSIDEDOWN:
-      this.actionSet = new UpsideDownActionSet(this.body);
-      break;
-    case EN_.EFFECT._HYPED:
-      this.actionSet = new HypedActionSet(this.body);
-      break;
-    case EN_.EFFECT._CHAMELEONIC:
-      this.actionSet = new ChameleonicActionSet(this.body);
-      break;
-    case EN_.EFFECT._POISONED:
-      this.actionSet = new PoisonedActionSet(this.body);
-      break;
-    case EN_.EFFECT._MUTANT:
-      this.actionSet = new MutantActionSet(this.body);
-      break;
-    case EN_.EFFECT._SPLIT:
-      this.actionSet = new SplitActionSet(this.body);
-      break;
-    case EN_.EFFECT._CIRCULATED:
-      this.actionSet = new CirculatedActionSet(this.body);
-      break;
-    case EN_.EFFECT._FROZEN:
-      this.actionSet = new FrozenActionSet(this.body);
-      break;
-    case EN_.EFFECT._DIMENSIONAL:
-      this.actionSet = new DimensionalActionSet(this.body);
-      break;
-    case EN_.EFFECT._TREMBLING:
-      this.actionSet = new TremblingActionSet(this.body);
-      break;
-    case EN_.EFFECT._TIMEBOMB:
-      this.actionSet  = new TimeBombActionSet(this.body);
-      break;
-    case EN_.EFFECT._ELASTIC:
-      if (this.effect != EN_.EFFECT._ELASTIC) {
+  if (this.effect != effect) {
+    this.effect = effect;
+
+    switch (this.effect) {
+      case EN_.EFFECT._REVERSED:
+        this.actionSet = new ReversedActionSet(this.body);
+        break;
+      case EN_.EFFECT._DRUNK:
+        this.actionSet = new DrunkActionSet(this.body);
+        break;
+      case EN_.EFFECT._UPSIDEDOWN:
+        this.actionSet = new UpsideDownActionSet(this.body);
+        break;
+      case EN_.EFFECT._HYPED:
+        this.actionSet = new HypedActionSet(this.body);
+        break;
+      case EN_.EFFECT._CHAMELEONIC:
+        this.actionSet = new ChameleonicActionSet(this.body);
+        break;
+      case EN_.EFFECT._POISONED:
+        this.actionSet = new PoisonedActionSet(this.body);
+        break;
+      case EN_.EFFECT._MUTANT:
+        this.actionSet = new MutantActionSet(this.body);
+        break;
+      case EN_.EFFECT._SPLIT:
+        this.actionSet = new SplitActionSet(this.body);
+        break;
+      case EN_.EFFECT._CIRCULATED:
+        this.actionSet = new CirculatedActionSet(this.body);
+        break;
+      case EN_.EFFECT._FROZEN:
+        this.actionSet = new FrozenActionSet(this.body);
+        break;
+      case EN_.EFFECT._DIMENSIONAL:
+        this.actionSet = new DimensionalActionSet(this.body);
+        break;
+      case EN_.EFFECT._TREMBLING:
+        this.actionSet = new TremblingActionSet(this.body);
+        break;
+      case EN_.EFFECT._TIMEBOMB:
+        this.actionSet  = new TimeBombActionSet(this.body);
+        break;
+      case EN_.EFFECT._ELASTIC:
         this.actionSet = new ElasticActionSet(this.body);
-        //console.log(this.actionSet.puppy, this.actionSet.isShrinking);
-      }
-      break;
-    default:
-      this.actionSet = new NormalActionSet(this.body);
-      break;
+        break;
+      default:
+        this.actionSet = new NormalActionSet(this.body);
+        break;
+    }
   }
-  this.effect = effect;
-  console.log(this.actionSet.puppy, this.actionSet.isShrinking);
 
-  //--- bypassing action methods
-  this.getNextHeadPos = this.actionSet.getNextHeadPos;
-  this.updateHeadPos = this.actionSet.updateHeadPos;
-  this.doUpdateTailPos = this.actionSet.doUpdateTailPos;
-  this.updateTailPos = this.actionSet.updateTailPos;
-  this.updateTrailingData = this.actionSet.updateTrailingData;
-  this.applyPostEffect = this.actionSet.applyPostEffect;
-
-  this.preProcessDir = this.actionSet.preProcessDir;
-  this.handleCtrl = this.actionSet.handleCtrl;
+  this.actionSet.applyEffect();
 };
 //------------------------------------------------------------------------------------------
-//  updateMovingDir
+//  handleMovCtrl
 //------------------------------------------------------------------------------------------
-Snake.prototype.updateMovingDir = function(dir) {
-  if (this.preProcessDir) {
-    dir = this.preProcessDir(dir);
-  }
-
-  if ((this.body.dataList.length == 1 && dir != appDataManager.getMovingDir(this.body.dataList[0].pos, this.trailingData[0].pos)) ||
-    (this.body.dataList.length > 1 && dir != appDataManager.getMovingDir(this.body.dataList[0].pos, this.body.dataList[1].pos))) {
-    this.body.curMovingDir = dir;
-  }
-};
+Snake.prototype.handleMovCtrl = function(dir) {
+  return this.actionSet.handleMovCtrl(dir);
+}
+//------------------------------------------------------------------------------------------
+//  handleActCtrl
+//------------------------------------------------------------------------------------------
+Snake.prototype.handleActCtrl = function(key) {
+  return this.actionSet.handleActCtrl(key);
+}
+//------------------------------------------------------------------------------------------
+//  getNextHeadPos
+//------------------------------------------------------------------------------------------
+Snake.prototype.getNextHeadPos = function() {
+  return this.actionSet.getNextHeadPos();
+}
+//------------------------------------------------------------------------------------------
+//  isColliding
+//------------------------------------------------------------------------------------------
+Snake.prototype.isColliding = function(nextHeadPos) {
+  return this.actionSet.isColliding(nextHeadPos);
+}
+//------------------------------------------------------------------------------------------
+//  updateHeadPos
+//------------------------------------------------------------------------------------------
+Snake.prototype.updateHeadPos = function(nextHeadPos) {
+  return this.actionSet.updateHeadPos(nextHeadPos);
+}
+//------------------------------------------------------------------------------------------
+//  shouldUpdateTailPos
+//------------------------------------------------------------------------------------------
+Snake.prototype.shouldUpdateTailPos = function() {
+  return this.actionSet.shouldUpdateTailPos();
+}
+//------------------------------------------------------------------------------------------
+//  updateTailPos
+//------------------------------------------------------------------------------------------
+Snake.prototype.updateTailPos = function() {
+  return this.actionSet.updateTailPos();
+}
+//------------------------------------------------------------------------------------------
+//  updateTrailingData
+//------------------------------------------------------------------------------------------
+Snake.prototype.updateTrailingData = function(lastTailData) {
+  return this.actionSet.updateTrailingData(lastTailData);
+}
+//------------------------------------------------------------------------------------------
+//  applyPostEffect
+//------------------------------------------------------------------------------------------
+Snake.prototype.applyPostEffect = function() {
+  return this.actionSet.applyPostEffect();
+}

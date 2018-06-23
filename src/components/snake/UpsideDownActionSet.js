@@ -12,8 +12,8 @@ export function UpsideDownActionSet(body) {
 }
 UpsideDownActionSet.prototype = Object.create(NormalActionSet.prototype);
 //------------------------------------------------------------------------------------------
-//  preProcessDir
+//  handleMovCtrl
 //------------------------------------------------------------------------------------------
-UpsideDownActionSet.prototype.preProcessDir = function(dir) {
-  return (EN_.KEY._LEFT + (((dir - EN_.KEY._LEFT) + 2) % 4));;
+UpsideDownActionSet.prototype.handleMovCtrl = function(dir) {
+  NormalActionSet.prototype.handleMovCtrl.call(this, EN_.KEY._LEFT + (((dir - EN_.KEY._LEFT) + 2) % 4));
 };
