@@ -206,8 +206,10 @@
         speed: 1,
       });
 
-      appEventBus.$on('render', () => {
+      appEventBus.$on('refresh', () => {
         vm.refresh();
+      });
+      appEventBus.$on('render', () => {
         vm.render();
       });
     }

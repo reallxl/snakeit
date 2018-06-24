@@ -71,7 +71,7 @@
         //this.dataManager.submit();
         this.preyList.unshift(new Prey());
 
-        this.processor = new GameProcessor(this.snakeList, this.preyList);
+        this.processor = new GameProcessor(this.curLevel, this.snakeList, this.preyList);
         this.processor.run();
 
         this.curStatus = EN_.STATUS._PLAYING;
@@ -144,6 +144,11 @@
         args.forEach((item) => {
           vm.colorSet[item.key] = item.val;
         });
+      });
+
+      appEventBus.$on('gameLvUpdate', (args) => {
+        vm.curLevel = args.lv;
+        vm.processor.updateLevel(vm.curLevel);
       });
 
       appEventBus.$on('spawnPrey', (args) => {

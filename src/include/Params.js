@@ -1,7 +1,8 @@
 import { EFFECT } from './Enums';
 
 export const
-  GAME_UPDATE_TICK = 300,
+  FRAME_TICK = 100,
+  FORGROUND_UPDATE_TICK = 1000,
   //--- size
   BLOCK_WIDTH = 5,
   BLOCK_HEIGHT = 5,
