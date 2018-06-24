@@ -12,7 +12,9 @@ ReversedActionSet.prototype = Object.create(NormalActionSet.prototype);
 //------------------------------------------------------------------------------------------
 //  applyEffect
 //------------------------------------------------------------------------------------------
-ReversedActionSet.prototype.applyEffect = function() {
+ReversedActionSet.prototype.applyEffect = function(onGrowing) {
+  NormalActionSet.prototype.applyEffect.call(this, onGrowing);
+
   //--- update total body length if needed
   if (this.body.length > this.body.dataList.length) {
     this.body.length = this.body.dataList.length;

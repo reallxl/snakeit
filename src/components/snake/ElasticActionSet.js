@@ -10,7 +10,7 @@ import { NormalActionSet } from './NormalActionSet'
 export function ElasticActionSet(body) {
   NormalActionSet.call(this, body);
 
-  this.body.isShrinking = true;
+  this.isShrinking = true;
 }
 ElasticActionSet.prototype = Object.create(NormalActionSet.prototype);
 //------------------------------------------------------------------------------------------
@@ -19,7 +19,7 @@ ElasticActionSet.prototype = Object.create(NormalActionSet.prototype);
 ElasticActionSet.prototype.getNextHeadPos = function() {
   let nextHeadPos = undefined;
 
-  if (!this.body.isShrinking) {
+  if (!this.isShrinking) {
     nextHeadPos = NormalActionSet.prototype.getNextHeadPos.call(this);
   }
 
@@ -29,7 +29,7 @@ ElasticActionSet.prototype.getNextHeadPos = function() {
 //  shouldUpdateTailPos
 //------------------------------------------------------------------------------------------
 ElasticActionSet.prototype.shouldUpdateTailPos = function() {
-  return (this.body.isShrinking && this.body.dataList.length > 1) || NormalActionSet.prototype.shouldUpdateTailPos.call(this);
+  return (this.isShrinking && this.body.dataList.length > 1) || NormalActionSet.prototype.shouldUpdateTailPos.call(this);
 }
 //------------------------------------------------------------------------------------------
 //  handleActCtrl
@@ -37,7 +37,7 @@ ElasticActionSet.prototype.shouldUpdateTailPos = function() {
 ElasticActionSet.prototype.handleActCtrl = function(key) {
   switch (key) {
     case EN_.KEY._BTN_A:
-      this.body.isShrinking = !this.body.isShrinking;
+      this.isShrinking = !this.isShrinking;
       break;
   }
 }

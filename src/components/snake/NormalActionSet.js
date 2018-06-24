@@ -1,4 +1,5 @@
 import * as EN_ from '../../include/Enums'
+import * as PA_ from '../../include/Params'
 
 import { appDataManager } from '../../main'
 import { appEventBus } from '../../main'
@@ -12,16 +13,22 @@ export function NormalActionSet(body) {
 //------------------------------------------------------------------------------------------
 //  applyEffect
 //------------------------------------------------------------------------------------------
-NormalActionSet.prototype.applyEffect = function() {
-  //--- dummy
+NormalActionSet.prototype.applyEffect = function(onGrowing) {
+  if (onGrowing) {
+    this.body.length++;
+  }
+
+  appEventBus.$emit('colorSetUpdate', [
+    {
+      key: 'snake',
+      val: PA_.DEFAULT_SNAKE_COLOR,
+    },
+  ]);
 }
 //------------------------------------------------------------------------------------------
 //  handleMovCtrl
 //------------------------------------------------------------------------------------------
 NormalActionSet.prototype.handleMovCtrl = function(dir) {
-  if (this.body.dataList.length == 1) {
-    console.log(this.body.trailingDataList.length);
-  }
   if ((this.body.dataList.length == 1 && dir != appDataManager.getMovingDir(this.body.dataList[0].pos, this.body.trailingDataList[0].pos)) ||
     (this.body.dataList.length > 1 && dir != appDataManager.getMovingDir(this.body.dataList[0].pos, this.body.dataList[1].pos))) {
     this.body.curMovingDir = dir;

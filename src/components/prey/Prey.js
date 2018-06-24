@@ -7,9 +7,13 @@ import { appDataManager } from '../../main'
 //  Prey
 //------------------------------------------------------------------------------------------
 export function Prey({
-  pos = null,
+  pos = appDataManager.getRandomAvailablePos(),
   effect = PA_.DEFAULT_EFFECT,
+  color = undefined,
 } = {}) {
-  this.pos = pos || appDataManager.getRandomAvailablePos();
+  this.pos = pos;
   this.effect = effect;
+  if (color) {
+    this.color = color;
+  }
 }

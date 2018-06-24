@@ -23,7 +23,7 @@ export const
   INIT_GAME_LEVEL = 8,
   INIT_BODY_LENGTH = 10,
   INIT_TRAILING_LENGTH = 1,
-  DEFAULT_EFFECT = EFFECT._ELASTIC,
+  DEFAULT_EFFECT = EFFECT._TIMEBOMB,
 
   //--- effect parameters
   DRUNK_LEVEL = [0.33, 0.83, 1, 1, 2, 2],
@@ -45,7 +45,6 @@ export const
   FROZEN_COLOR = '#58D3F7',
   BOMBER_MAX_COUNTDOWN = 10,
   BOMBER_COLOR = [
-    DEFAULT_SNAKE_COLOR,
     '#FF0000',
     '#FE2E2E',
     '#FA5858',

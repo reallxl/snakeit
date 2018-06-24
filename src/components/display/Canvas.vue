@@ -130,13 +130,13 @@
         this.dataMap.fill(PA_.DEFAULT_COLORSET.backGround);
 
         this.snakeList.forEach(snake => {
-          snake.body.dataList.forEach(bodyNode => {
-            this.dataMap.splice(bodyNode.pos, 1, snake.body.dataList.indexOf(bodyNode) == 0 ?
-              PA_.DEFAULT_SNAKE_HEAD_COLOR : PA_.DEFAULT_SNAKE_COLOR);
-          });
+          this.dataMap.splice(snake.body.dataList[0].pos, 1, this.colorSet.snakeHead);
+          for (let n = 1; n < snake.body.dataList.length; n++) {
+            this.dataMap.splice(snake.body.dataList[n].pos, 1, this.colorSet.snake);
+          }
         });
 
-        this.preyList.forEach(prey => this.dataMap.splice(prey.pos, 1, PA_.DEFAULT_PREY_COLOR));
+        this.preyList.forEach(prey => this.dataMap.splice(prey.pos, 1, prey.color ? prey.color : this.colorSet.prey));
 
         //--- loop throgh all objects
         for (let o = 0; o < this.objList.length; o++) {

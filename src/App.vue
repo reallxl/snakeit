@@ -47,6 +47,7 @@
         },
         colorSet: {
           backGround: PA_.DEFAULT_BG_COLOR,
+          snakeHead: PA_.DEFAULT_SNAKE_HEAD_COLOR,
           snake: PA_.DEFAULT_SNAKE_COLOR,
           prey: PA_.DEFAULT_PREY_COLOR,
         },
@@ -137,6 +138,16 @@
       });
       appEventBus.$on('actCtrlFire', (args) => {
         vm.processor.handleActCtrl(args.key);
+      });
+
+      appEventBus.$on('colorSetUpdate', (args) => {
+        args.forEach((item) => {
+          vm.colorSet[item.key] = item.val;
+        });
+      });
+
+      appEventBus.$on('spawnPrey', (args) => {
+        this.preyList.unshift(new Prey(args));
       });
     }
   }

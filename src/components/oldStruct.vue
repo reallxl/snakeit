@@ -30,16 +30,6 @@
             snakeData.split.forEach((split) => {
               this._stepMove(split, false);
             });
-          } else if (this.effectModifier.type == EN._EFFECT._FROZEN) {
-            if (this._applyFrozenEffect({
-              action: EN._PHASE._STEP_MOVE,
-            })) {
-              break;
-            }
-          } else if (this.effectModifier.type == EN._EFFECT._BOMBER) {
-            this._applyBomberEffect({
-              action: EN._PHASE._STEP_MOVE,
-            });
           }
 
           //--- phase 1: head move
@@ -158,10 +148,6 @@
                 snakeData.trailingData.pop();
               }
             }
-
-            if (this.effectModifier.type == EN._EFFECT._CHAMELEONIC) {
-              this._applyChameleonicEffect();
-            }
           } while (0);
         } while (0);
 
@@ -205,10 +191,6 @@
             case EN._EFFECT._SPLIT: this._applySplitEffect({
                 action: EN._PHASE._INIT,
                 snakeData: snakeData,
-              }); break;
-            case EN._EFFECT._EARTHQUAKE: this._applyEarthQuakeEffect(); break;
-            case EN._EFFECT._BOMBER: this._applyBomberEffect({
-                action: EN._PHASE._INIT,
               }); break;
           }
 
@@ -278,29 +260,6 @@
         }
 
         return (arg.tick / (Math.floor(Math.random() * (PA_.HYPED_LEVEL[PA_.HYPED_LEVEL.length - 1] - PA_.HYPED_LEVEL[0] + 1)) + PA_.HYPED_LEVEL[0]));
-      },
-      _applyChameleonicEffect(arg) {
-        if (this.effectModifier.type != EN._EFFECT._CHAMELEONIC) {
-          this.effectModifier = {
-            type: EN._EFFECT._CHAMELEONIC,
-            curChameleonicLvlID: 0,
-          };
-        }
-
-        this.effectModifier.curChameleonicLvlID = ((this.effectModifier.curChameleonicLvlID + 1) % PA_.CHAMELEONIC_LEVEL.length);
-        this.colorSet.snake = PA_.CHAMELEONIC_COLOR[PA_.CHAMELEONIC_LEVEL[this.effectModifier.curChameleonicLvlID]];
-
-        /*var curPos, newData;
-        curPos = this.snake.curTailPos;
-        for (let i = 0; i < this.snake.curLength; i++) {
-          if (i / this.snake.curLength > 0.4 && i / this.snake.curLength < 0.6) {
-            newData = Object.assign({}, this.map[curPos]);
-            newData.color = PA_.DEFAULT_SNAKE_COLOR;
-            this.map.splice(curPos, 1, newData);
-          }
-
-          curPos = this.getNextPos(curPos);
-        }*/
       },
       _applyEnlargedEffect(arg) {
         let markBodySpanNode = (pos, type) => {
@@ -712,155 +671,6 @@ for (let i = 0; i < this.effectModifier.split.length; i++) {
           }
         }
       },
-      _applyFrozenEffect(arg) {
-        var ret = false;
-
-        switch (arg.action) {
-          case EN._PHASE._INIT: {
-            if (this.effectModifier.type != EN._EFFECT._FROZEN) {
-              this.effectModifier = {
-                type: EN._EFFECT._FROZEN,
-                movingDir: undefined,
-              };
-            }
-
-            break;
-          }
-          case EN._PHASE._STEP_MOVE: {
-            if (Math.random() >= PA_.FROZEN_CHANCE) {
-              //--- restore to normal gameStep
-              this.colorSet.snake = PA_.DEFAULT_SNAKE_COLOR;
-              this.effectModifier.movingDir = undefined;
-            } else {
-              //--- frozen gameStep
-              if (this.effectModifier.movingDir == undefined) {
-                //--- initialize
-                this.colorSet.snake = PA_.FROZEN_COLOR;
-                this.effectModifier.movingDir = this.snake.curHeadingDir;
-
-                if (this.snake.length > this.snake.bodyData.length) {
-                  this.snake.length = this.snake.bodyData.length;
-                }
-              }
-
-              //--- frozen body move
-              this.snake.bodyData.forEach((bodyNode) => {
-                this.map.splice(bodyNode.pos, 1, null);
-                bodyNode.pos = this.getNextPos(bodyNode.pos, this.effectModifier.movingDir);
-              });
-              this.snake.bodyData.forEach((bodyNode) => {
-                if (this.map[bodyNode.pos] && this.map[bodyNode.pos].type == EN._NODE_TYPE._PREY) {
-                  this._devourPrey(bodyNode.pos, this.snake);
-                }
-                this.map.splice(bodyNode.pos, 1, {
-                  type: EN._NODE_TYPE._SNAKE,
-                });
-              });
-
-              ret = true;
-            }
-
-            break;
-          }
-          case EN._PHASE._CTRL_INPUT: {
-            if (this.effectModifier.movingDir != undefined) {
-              this.effectModifier.movingDir = arg.dir;
-//              console.log('frozen:',this.effectModifier.movingDir);
-              ret = true;
-            }
-
-            break;
-          }
-        }
-
-        return ret;
-      },
-      _applyEarthQuakeEffect(arg) {
-        if (this.effectModifier.type != EN._EFFECT._EARTHQUAKE) {
-          this.effectModifier = {
-            type: EN._EFFECT._EARTHQUAKE,
-          };
-        }
-
-        let shakingDir = Math.floor(Math.random() * 4);
-
-        this.snake.bodyData.forEach((bodyNode) => {
-          this.map.splice(bodyNode.pos, 1, null);
-          bodyNode.pos = this.getNextPos(bodyNode.pos, shakingDir);
-        });
-        this.snake.bodyData.forEach((bodyNode) => {
-          if (this.snake.bodyData.indexOf(bodyNode) == 0) {
-            if (this.map[bodyNode.pos] && this.map[bodyNode.pos].type == EN._NODE_TYPE._PREY) {
-              this._devourPrey(nodyNode.pos, this.snake);
-            }
-            this.map.splice(bodyNode.pos, 1, {
-              type: EN._NODE_TYPE._SNAKE,
-              color: PA_.DEFAULT_SNAKE_HEAD_COLOR,
-            });
-          } else {
-            if (this.map[bodyNode.pos] && this.map[bodyNode.pos].type == EN._NODE_TYPE._PREY) {
-              this._scoutNewPrey();
-            }
-            this.map.splice(bodyNode.pos, 1, {
-              type: EN._NODE_TYPE._SNAKE,
-            });
-          }
-        });
-
-        setTimeout(this._applyEarthQuakeEffect, (40 * (Math.floor(Math.random() * 10) + 1)));
-      },
-      _applyBomberEffect(arg) {
-        switch (arg.action) {
-          case EN._PHASE._INIT: {
-            if (this.effectModifier.type != EN._EFFECT._BOMBER) {
-              this.effectModifier = {
-                type: EN._EFFECT._BOMBER,
-                nodeNum: Math.floor(Math.random() * (this.snake.bodyData.length - 1)) + 1,
-                CountDown: Math.floor(Math.random() * PA_.BOMBER_MAX_COUNTDOWN) + 1,
-              };
-//console.log('num:',this.bomberBodyNodeNum);
-              this.effectModifier.curCountDown = this.effectModifier.CountDown;
-              this.colorSet.snake = PA_.BOMBER_COLOR[this.effectModifier.curCountDown];
-            }
-
-            break;
-          }
-          case EN._PHASE._STEP_MOVE: {
-            if (this.effectModifier.curCountDown) {
-//console.log('cnt:',this.effectModifier.curCountDown);
-              this.effectModifier.curCountDown--;
-              this.colorSet.snake = PA_.BOMBER_COLOR[Math.floor(this.effectModifier.curCountDown * PA_.BOMBER_COLOR.length / this.effectModifier.countDown)];
-
-              if (this.effectModifier.curCountDown == 0) {
-                this.snake.trailingData = [this.snake.bodyData[this.snake.bodyData.length - this.effectModifier.nodeNum]];
-
-                let cnt = 0;
-                do {
-                  this.map.splice(this.snake.bodyData[this.snake.bodyData.length - 1].pos, 1, null);
-
-                  //--- split body into pieces and randomly place on map
-                  this.map.splice(this.getRandomAvailablePos(), 1, {
-                    type: EN._NODE_TYPE._PREY,
-                    effect: EN._EFFECT._NORMAL,
-                    color: PA_.DEFAULT_SNAKE_COLOR,
-                  });
-
-                  this.snake.bodyData.pop();
-                  cnt++;
-                } while (cnt < this.effectModifier.nodeNum);
-
-                this.snake.length = this.snake.bodyData.length;
-
-                this.effectModifier = {
-                  type: EN._EFFECT._NORMAL,
-                }
-              }
-            }
-
-            break;
-          }
-        }
-      },
       //------------------------------------------------------------------------------------------
       //  primitive functions
       //------------------------------------------------------------------------------------------
@@ -869,18 +679,6 @@ for (let i = 0; i < this.effectModifier.split.length; i++) {
           case EN._EFFECT._DRUNK: {
             if (this._applyDrunkEffect({
               action: EN._PHASE._CTRL_INPUT,
-            })) {
-              return;
-            }
-            break;
-          }
-          case EN._EFFECT._CIRCULATED: {
-            return;
-          }
-          case EN._EFFECT._FROZEN: {
-            if (this._applyFrozenEffect({
-              action: EN._PHASE._CTRL_INPUT,
-              dir: dir,
             })) {
               return;
             }

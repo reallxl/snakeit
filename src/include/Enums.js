@@ -25,6 +25,7 @@ export const
   }),
   //--- effect
   EFFECT = Object.freeze({
+    _NONE: -1,
     _NORMAL: 0,
     _REVERSED: 1,         //--- 17/12/25 //--- 18/01/13 //--- 18/02/04
     _DRUNK: 2,            //--- 17/12/27 //--- 18/01/14 //--- 18/02/04
@@ -40,6 +41,9 @@ export const
     _TREMBLING: 12,       //--- 18/02/08
     _TIMEBOMB: 13,        //--- 18/02/04
     _ELASTIC: 14,         //--- 18/03/11
+  }),
+  RES = Object.freeze({
+    _RESET: 0,
   }),
   //--- effect action
   PHASE = Object.freeze({

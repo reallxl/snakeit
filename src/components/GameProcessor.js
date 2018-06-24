@@ -39,7 +39,7 @@ GameProcessor.prototype.runSingleGameTurn = function() {
   this.snakeList.forEach((snake) => {
     //--- advance snake head position
     let nextHeadPos = snake.getNextHeadPos();
-    
+
     if (snake.isColliding(nextHeadPos)) {
       //--- colliding (i.e. GAME OVER)
       return appEventBus.$emit('gameOver', {
@@ -51,14 +51,19 @@ GameProcessor.prototype.runSingleGameTurn = function() {
 
     //--- apply action effect upon preying
     let eatenPrey = this.preyList.find((prey) => {
-      return prey.pos == nextHeadPos;
+      return prey.pos == nextHeadPos || //--- quick check
+        snake.body.dataList.find((bodyNode) => {
+          return prey.pos == bodyNode.pos;
+        });
     });
 
     if (eatenPrey) {
       snake.grow(eatenPrey.effect);
 
+      if (eatenPrey.effect != EN_.EFFECT._NONE) {
+        this.preyList.unshift(new Prey());
+      }
       this.preyList.splice(this.preyList.indexOf(eatenPrey), 1);
-      this.preyList.unshift(new Prey());
     }
 
     //--- advance snake tail position
@@ -66,29 +71,17 @@ GameProcessor.prototype.runSingleGameTurn = function() {
       snake.updateTrailingData(snake.updateTailPos());
     }
 
-    snake.applyPostEffect();
+    switch (snake.applyPostEffect()) {
+      case EN_.RES._RESET:
+        snake.updateBodyEffect(EN_.EFFECT._NORMAL, false);
+        break;
+      default:
+        break;
+    }
   });
 
   //this.dataManager.submit();
   appEventBus.$emit('render');
-
-  //--- render snake
-/*  this.snakeList.forEach((snake) => {
-    snake.body.dataList.forEach((bodyNode) => {
-      this.dataMap.splice(bodyNode.pos, 1, {
-        type: EN_.NODE_TYPE._SNAKE,
-        color: snake.body.dataList.indexOf(bodyNode) == 0 ?
-          PA_.DEFAULT_SNAKE_HEAD_COLOR : PA_.DEFAULT_SNAKE_COLOR,
-      });
-    });
-  });
-
-  //--- render prey
-  this.preyList.forEach((prey) => {
-    this.dataMap.splice(prey.pos, 1, {
-      type: EN_.NODE_TYPE._PREY,
-    });
-  });*/
 
   //--- schedule next frame update
   let self = this;

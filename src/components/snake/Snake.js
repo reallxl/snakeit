@@ -38,24 +38,23 @@ export function Snake({
     trailingDataList: trailingDataList,
   };
 
-  this.effect = this.actionSet = undefined;
-  this.updateBodyEffect(effect);
+  //this.effect = undefined;
+  //this.actionSet = undefined;
+  this.updateBodyEffect(effect, false);
 }
 //------------------------------------------------------------------------------------------
 //  grow
 //------------------------------------------------------------------------------------------
 Snake.prototype.grow = function(effect) {
-  this.body.length++;
-
   //--- update action set based on prey effect
   this.updateBodyEffect(effect);
 };
 //------------------------------------------------------------------------------------------
 //  updateBodyEffect
 //------------------------------------------------------------------------------------------
-Snake.prototype.updateBodyEffect = function(effect) {
+Snake.prototype.updateBodyEffect = function(effect, onGrowing = true) {
   //--- update action set based on prey effect
-  if (this.effect != effect) {
+  if (effect != EN_.EFFECT._NONE && effect != this.effect) {
     this.effect = effect;
 
     switch (this.effect) {
@@ -107,7 +106,7 @@ Snake.prototype.updateBodyEffect = function(effect) {
     }
   }
 
-  this.actionSet.applyEffect();
+  this.actionSet.applyEffect(onGrowing);
 };
 //------------------------------------------------------------------------------------------
 //  handleMovCtrl
@@ -120,6 +119,12 @@ Snake.prototype.handleMovCtrl = function(dir) {
 //------------------------------------------------------------------------------------------
 Snake.prototype.handleActCtrl = function(key) {
   return this.actionSet.handleActCtrl(key);
+}
+//------------------------------------------------------------------------------------------
+//  runSingleStep
+//------------------------------------------------------------------------------------------
+Snake.prototype.runSingleStep = function() {
+  return this.actionSet.runSingleStep();
 }
 //------------------------------------------------------------------------------------------
 //  getNextHeadPos
