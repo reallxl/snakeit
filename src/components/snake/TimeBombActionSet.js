@@ -31,7 +31,7 @@ TimeBombActionSet.prototype.applyPostEffect = function() {
 
       let cnt = 0;
       for (let n = 0; n < this.bombingNodeNum; n++) {
-        appEventBus.$emit('spawnPrey', {
+        appEventBus.$emit('preySpawn', {
           effect: EN_.EFFECT._NONE,
           color: PA_.DEFAULT_SNAKE_COLOR,
         });

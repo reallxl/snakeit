@@ -1,7 +1,8 @@
 import { EFFECT } from './Enums';
 
 export const
-  FRAME_TICK = 100,
+  FRAME_RATE = 20,
+  //FRAME_TICK = 100,
   FORGROUND_UPDATE_TICK = 1000,
   //--- size
   BLOCK_WIDTH = 5,
@@ -21,7 +22,7 @@ export const
 
   //--- basic parameters
   MAX_GAME_LEVEL = 10,
-  INIT_GAME_LEVEL = 8,
+  INIT_GAME_LEVEL = 3,
   INIT_BODY_LENGTH = 10,
   INIT_TRAILING_LENGTH = 1,
   DEFAULT_EFFECT = EFFECT._TIMEBOMB,

@@ -25,6 +25,7 @@ import { ElasticActionSet } from './ElasticActionSet'
 export function Snake({
   length = PA_.INIT_BODY_LENGTH,
   dataList = [],
+  curSpeed = PA_.INIT_GAME_LEVEL,
   curMovingDir = EN_.KEY._RIGHT,
   trailingLength = PA_.INIT_TRAILING_LENGTH,
   trailingDataList = [],
@@ -33,6 +34,7 @@ export function Snake({
   this.body = {
     length: length,
     dataList: dataList,
+    curSpeed: curSpeed,
     curMovingDir: curMovingDir,
     trailingLength: trailingLength,
     trailingDataList: trailingDataList,
@@ -41,13 +43,24 @@ export function Snake({
   //this.effect = undefined;
   //this.actionSet = undefined;
   this.updateBodyEffect(effect, false);
+
+  this.curMoveTick = 0;
 }
 //------------------------------------------------------------------------------------------
-//  grow
+//  shouldMove
 //------------------------------------------------------------------------------------------
-Snake.prototype.grow = function(effect) {
-  //--- update action set based on prey effect
-  this.updateBodyEffect(effect);
+Snake.prototype.shouldMove = function() {
+  let ret;
+
+  if (this.curMoveTick == 0) {
+    ret = true;
+    this.curMoveTick =  Math.floor(PA_.FRAME_RATE / this.body.curSpeed);
+  } else {
+    ret = false;
+    this.curMoveTick--;
+  }
+
+  return ret;
 };
 //------------------------------------------------------------------------------------------
 //  updateBodyEffect

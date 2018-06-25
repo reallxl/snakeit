@@ -24,16 +24,13 @@
   import appColorBlock from './ColorBlock.vue'
   import appPixelBlock from './PixelBlock.vue'
 
-  import CloudPattern from '../environment/CloudPattern'
-  import TreePattern from '../environment/TreePattern'
-
   export default {
     props: {
       mapSize: Object,
       colorSet: Object,
       snakeList: Array,
       preyList: Array,
-      //itemList: Array,
+      envObjList: Array,
     },
     components: {
       appColorBlock,
@@ -42,7 +39,6 @@
     data() {
       return {
         dataMap: new Array(this.mapSize.width * this.mapSize.height).fill(PA_.DEFAULT_COLORSET.backGround),
-        objList: [],
         tick: null,
       };
     },
@@ -57,56 +53,6 @@
             self.refresh();
             self.render();
           }, 1000);
-        }
-      },
-      refresh() {
-        for (let o = 0; o < this.objList.length; o++) {
-          let obj = this.objList[o];
-
-          if (obj.curFrmNum != undefined) {
-            obj.curFrmNum = (obj.curFrmNum + 1) % obj.pattern.frameList.length;
-          }
-
-          if (obj.dirList) {
-            if (obj.curOfst == undefined) {
-              obj.curOfst = {
-                x: 0,
-                y: 0,
-              }
-            }
-
-            if (obj.dirList.includes(EN_.KEY._LEFT)) {
-              obj.curOfst.x -= obj.speed;
-
-              if (obj.curOfst.x < 0) {
-                obj.startingPos--;
-                obj.curOfst.x += PA_.BLOCK_WIDTH;
-              }
-            } else if (obj.dirList.includes(EN_.KEY._RIGHT)) {
-              obj.curOfst.x += obj.speed;
-
-              if (obj.curOfst.x >= PA_.BLOCK_WIDTH) {
-                obj.startingPos++;
-                obj.curOfst.x -= PA_.BLOCK_WIDTH;
-              }
-            }
-
-            if (obj.dirList.includes(EN_.KEY._UP)) {
-              obj.curOfst.y -= obj.speed;
-
-              if (obj.curOfst.y < 0) {
-                obj.startingPos -= PA_.DEFAULT_MAP_WIDTH;
-                obj.curOfst.y += PA_.BLOCK_HEIGHT;
-              }
-            } else if (obj.dirList.includes(EN_.KEY._DOWN)) {
-              obj.curOfst.y += obj.speed;
-
-              if (obj.curOfst.y >= PA_.BLOCK_HEIGHT) {
-                obj.startingPos += PA_.DEFAULT_MAP_WIDTH;
-                obj.curOfst.y -= PA_.BLOCK_HEIGHT;
-              }
-            }
-          }
         }
       },
       render() {
@@ -139,8 +85,8 @@
         this.preyList.forEach(prey => this.dataMap.splice(prey.pos, 1, prey.color ? prey.color : this.colorSet.prey));
 
         //--- loop throgh all objects
-        for (let o = 0; o < this.objList.length; o++) {
-          let obj = this.objList[o];
+        for (let o = 0; o < this.envObjList.length; o++) {
+          let obj = this.envObjList[o];
           let curFrm = obj.curFrmNum ? obj.pattern.frameList[obj.curFrmNum] : obj.pattern.frameList[0];
           let curBlockData, lastBlockPos = undefined, blockDataList = [];
           let bbb;
@@ -190,25 +136,6 @@
     created() {
       let vm = this;
 
-      vm.objList.push({
-        pattern: TreePattern,
-        startingPos: 110,
-        curFrmNum: 0,
-      });
-      vm.objList.push({
-        pattern: CloudPattern,
-        startingPos: 96,
-        visiblePos: 100,
-        endingPos: 100,
-        dirList: [
-          EN_.KEY._RIGHT,
-        ],
-        speed: 1,
-      });
-
-      appEventBus.$on('refresh', () => {
-        vm.refresh();
-      });
       appEventBus.$on('render', () => {
         vm.render();
       });

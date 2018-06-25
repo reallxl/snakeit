@@ -5,17 +5,23 @@ import { appEventBus } from '../main'
 
 import { Prey } from './prey/Prey'
 
+import CloudPattern from './environment/CloudPattern'
+import TreePattern from './environment/TreePattern'
+
 //------------------------------------------------------------------------------------------
 //  GameProcessor
 //------------------------------------------------------------------------------------------
-export function GameProcessor(curLevel, snakeList, preyList) {
-  this.curLevel = curLevel;
+export function GameProcessor(snakeList, preyList, envObjList) {
+  //--- snake
   this.snakeList = snakeList;
   this.curActiveSnakeId = 0;
 
+  //--- prey
   this.preyList = preyList;
 
-  this.curTick = 0;
+  //--- environmental object
+  this.envObjList = envObjList;
+
   this.turnProcID = NaN;
 }
 //------------------------------------------------------------------------------------------
@@ -43,18 +49,38 @@ GameProcessor.prototype.updateLevel = function(level) {
 //------------------------------------------------------------------------------------------
 GameProcessor.prototype.runSingleGameTurn = function() {
   //this.dataManager.fetch();
+  let ret = this.processPlayerPhase();
 
-  if (this.curTick % (PA_.MAX_GAME_LEVEL - this.curLevel + 1) == 0) {
-    //--- snake movement
-    this.snakeList.forEach((snake) => {
+  if (ret != 0) {
+    appEventBus.$emit('gameOver', {
+      pos: ret.collidePos,
+    });
+  }
+  this.processEnvironmentPhase();
+  //this.dataManager.submit();
+  appEventBus.$emit('render');
+
+  //--- schedule next frame update
+  let self = this;
+  this.turnProcID = setTimeout( function() {
+    self.runSingleGameTurn();
+  }, 1000 / PA_.FRAME_RATE, this);
+}
+//------------------------------------------------------------------------------------------
+//  processPlayerPhase
+//------------------------------------------------------------------------------------------
+GameProcessor.prototype.processPlayerPhase = function() {
+  //--- snake movement
+  this.snakeList.forEach((snake) => {
+    if (snake.shouldMove()) {
       //--- advance snake head position
       let nextHeadPos = snake.getNextHeadPos();
 
       if (snake.isColliding(nextHeadPos)) {
         //--- colliding (i.e. GAME OVER)
-        return appEventBus.$emit('gameOver', {
-          pos: nextHeadPos,
-        });
+        return {
+          collidePos: nextHeadPos,
+        };
       } else if (nextHeadPos != undefined) {
         snake.updateHeadPos(nextHeadPos);
       }
@@ -68,7 +94,7 @@ GameProcessor.prototype.runSingleGameTurn = function() {
       });
 
       if (eatenPrey) {
-        snake.grow(eatenPrey.effect);
+        snake.updateBodyEffect(eatenPrey.effect);
 
         if (eatenPrey.effect != EN_.EFFECT._NONE) {
           this.preyList.unshift(new Prey());
@@ -88,24 +114,70 @@ GameProcessor.prototype.runSingleGameTurn = function() {
         default:
           break;
       }
-    });
-  }
+    }
+  });
 
-  if (this.curTick % (PA_.FORGROUND_UPDATE_TICK / PA_.FRAME_TICK) == 0) {
-    //--- environment movement
-    appEventBus.$emit('refresh');
-  }
+  return 0;
+}
+//------------------------------------------------------------------------------------------
+//  processEnvironmentPhase
+//------------------------------------------------------------------------------------------
+GameProcessor.prototype.processEnvironmentPhase = function() {
+  //--- environment movement
+  this.envObjList.forEach((obj) => {
+    if (obj.curMoveTick == 0) {
+      if (obj.curFrmNum != undefined) {
+        obj.curFrmNum = (obj.curFrmNum + 1) % obj.pattern.frameList.length;
+      }
 
-  //this.dataManager.submit();
-  appEventBus.$emit('render');
+      if (obj.dirList) {
+        if (obj.curOfst == undefined) {
+          obj.curOfst = {
+            x: 0,
+            y: 0,
+          }
+        }
 
-  this.curTick++;
+        if (obj.dirList.includes(EN_.KEY._LEFT)) {
+          obj.curOfst.x -= obj.speed;
 
-  //--- schedule next frame update
-  let self = this;
-  this.turnProcID = setTimeout( function() {
-    self.runSingleGameTurn();
-  }, PA_.FRAME_TICK, this);
+          if (obj.curOfst.x < 0) {
+            obj.startingPos--;
+            obj.curOfst.x += PA_.BLOCK_WIDTH;
+          }
+        } else if (obj.dirList.includes(EN_.KEY._RIGHT)) {
+          obj.curOfst.x += obj.speed;
+
+          if (obj.curOfst.x >= PA_.BLOCK_WIDTH) {
+            obj.startingPos++;
+            obj.curOfst.x -= PA_.BLOCK_WIDTH;
+          }
+        }
+
+        if (obj.dirList.includes(EN_.KEY._UP)) {
+          obj.curOfst.y -= obj.speed;
+
+          if (obj.curOfst.y < 0) {
+            obj.startingPos -= PA_.DEFAULT_MAP_WIDTH;
+            obj.curOfst.y += PA_.BLOCK_HEIGHT;
+          }
+        } else if (obj.dirList.includes(EN_.KEY._DOWN)) {
+          obj.curOfst.y += obj.speed;
+
+          if (obj.curOfst.y >= PA_.BLOCK_HEIGHT) {
+            obj.startingPos += PA_.DEFAULT_MAP_WIDTH;
+            obj.curOfst.y -= PA_.BLOCK_HEIGHT;
+          }
+        }
+      }
+
+      obj.curMoveTick = Math.floor(PA_.FRAME_RATE / obj.speed);
+    } else {
+      obj.curMoveTick--;
+    }
+  });
+
+  return 0;
 }
 //------------------------------------------------------------------------------------------
 //  handleMovCtrl

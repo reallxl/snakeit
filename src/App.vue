@@ -2,7 +2,7 @@
   <div>
     <app-controller :curStatus="curStatus"></app-controller>
     <app-debug-panel :curStatus="curStatus" :mapSize="mapSize" :snakeList="snakeList"></app-debug-panel>
-    <app-canvas :mapSize="mapSize" :colorSet="colorSet" :snakeList="snakeList" :preyList="preyList"></app-canvas>
+    <app-canvas :mapSize="mapSize" :colorSet="colorSet" :snakeList="snakeList" :preyList="preyList" :envObjList="envObjList"></app-canvas>
   </div>
 </template>
 
@@ -18,6 +18,9 @@
   import { Prey } from './components/prey/Prey'
   import { Snake } from './components/snake/Snake'
   import { GameProcessor } from './components/GameProcessor'
+
+  import CloudPattern from './components/environment/CloudPattern'
+  import TreePattern from './components/environment/TreePattern'
 
   import appController from './components/Controller.vue'
   import appDebugPanel from './components/DebugPanel.vue'
@@ -56,6 +59,7 @@
         //----------------------------------------------------------------------------------------
         snakeList: [],
         preyList: [],
+        envObjList: [],
         processor: undefined,
       };
     },
@@ -66,12 +70,33 @@
       startGame() {
         appDataManager.init(this.mapSize, this.snakeList, this.preyList);
 
-        this.snakeList.unshift(new Snake());
+        this.snakeList.unshift(new Snake({
+          curSpeed: this.curLevel,
+        }));
         //--- in order to denote occupied positions by snake
         //this.dataManager.submit();
         this.preyList.unshift(new Prey());
 
-        this.processor = new GameProcessor(this.curLevel, this.snakeList, this.preyList);
+        this.envObjList.push({
+            pattern: TreePattern,
+            startingPos: 110,
+            curFrmNum: 0,
+            speed: 1,
+            curMoveTick: 0,
+          },
+          {
+            pattern: CloudPattern,
+            startingPos: 96,
+            visiblePos: 100,
+            endingPos: 100,
+            dirList: [
+              EN_.KEY._RIGHT,
+            ],
+            speed: 1,
+            curMoveTick: 0,
+          });
+
+        this.processor = new GameProcessor(this.snakeList, this.preyList, this.envObjList);
         this.processor.run();
 
         this.curStatus = EN_.STATUS._PLAYING;
@@ -146,12 +171,7 @@
         });
       });
 
-      appEventBus.$on('gameLvUpdate', (args) => {
-        vm.curLevel = args.lv;
-        vm.processor.updateLevel(vm.curLevel);
-      });
-
-      appEventBus.$on('spawnPrey', (args) => {
+      appEventBus.$on('preySpawn', (args) => {
         this.preyList.unshift(new Prey(args));
       });
     }
